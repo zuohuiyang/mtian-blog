@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head><meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="profile" href="http://gmpg.org/xfn/11">
+    <link rel="pingback" href="/xmlrpc.php">
+    <title>C++的各种字符串和常见问题 – 麦田的小黑屋</title>
+<meta name="robots" content="max-image-preview:large">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » Feed" href="/feed/">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » 评论 Feed" href="/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » C++的各种字符串和常见问题 评论 Feed" href="/2019/02/cstringandbugs/feed/">
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="/wp-json/oembed/1.0/embed?url=https%3A%2F%2F%2F2019%2F02%2Fcstringandbugs%2F">
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="/wp-json/oembed/1.0/embed?url=https%3A%2F%2F%2F2019%2F02%2Fcstringandbugs%2F&amp;format=xml">
+<style id="wp-img-auto-sizes-contain-inline-css" type="text/css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id="wp-emoji-styles-inline-css" type="text/css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<style id="wp-block-library-inline-css" type="text/css">
+:root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}.has-text-align-center{text-align:center}.has-text-align-left{text-align:left}.has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-wrap:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style*=border-top-color]){border-top-style:solid}html :where([style*=border-right-color]){border-right-style:solid}html :where([style*=border-bottom-color]){border-bottom-style:solid}html :where([style*=border-left-color]){border-left-style:solid}html :where([style*=border-width]){border-style:solid}html :where([style*=border-top-width]){border-top-style:solid}html :where([style*=border-right-width]){border-right-style:solid}html :where([style*=border-bottom-width]){border-bottom-style:solid}html :where([style*=border-left-width]){border-left-style:solid}html :where(img[class*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
+
+/*# sourceURL=wp-block-library-inline-css */
+</style>
+<style id="wp-block-heading-inline-css" type="text/css">
+h1:where(.wp-block-heading).has-background,h2:where(.wp-block-heading).has-background,h3:where(.wp-block-heading).has-background,h4:where(.wp-block-heading).has-background,h5:where(.wp-block-heading).has-background,h6:where(.wp-block-heading).has-background{padding:1.25em 2.375em}h1.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h1.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]),h2.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h2.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]),h3.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h3.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]),h4.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h4.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]),h5.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h5.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]),h6.has-text-align-left[style*=writing-mode]:where([style*=vertical-lr]),h6.has-text-align-right[style*=writing-mode]:where([style*=vertical-rl]){rotate:180deg}
+/*# sourceURL=/wp-includes/blocks/heading/style.min.css */
+</style>
+<style id="wp-block-paragraph-inline-css" type="text/css">
+.is-small-text{font-size:.875em}.is-regular-text{font-size:1em}.is-large-text{font-size:2.25em}.is-larger-text{font-size:3em}.has-drop-cap:not(:focus):first-letter{float:left;font-size:8.4em;font-style:normal;font-weight:100;line-height:.68;margin:.05em .1em 0 0;text-transform:uppercase}body.rtl .has-drop-cap:not(:focus):first-letter{float:none;margin-left:.1em}p.has-drop-cap.has-background{overflow:hidden}:root :where(p.has-background){padding:1.25em 2.375em}:where(p.has-text-color:not(.has-link-color)) a{color:inherit}p.has-text-align-left[style*="writing-mode:vertical-lr"],p.has-text-align-right[style*="writing-mode:vertical-rl"]{rotate:180deg}
+/*# sourceURL=/wp-includes/blocks/paragraph/style.min.css */
+</style>
+<style id="wp-block-preformatted-inline-css" type="text/css">
+.wp-block-preformatted{box-sizing:border-box;white-space:pre-wrap}:where(.wp-block-preformatted.has-background){padding:1.25em 2.375em}
+/*# sourceURL=/wp-includes/blocks/preformatted/style.min.css */
+</style>
+<style id="wp-block-quote-inline-css" type="text/css">
+.wp-block-quote{box-sizing:border-box;overflow-wrap:break-word}.wp-block-quote.is-large:where(:not(.is-style-plain)),.wp-block-quote.is-style-large:where(:not(.is-style-plain)){margin-bottom:1em;padding:0 1em}.wp-block-quote.is-large:where(:not(.is-style-plain)) p,.wp-block-quote.is-style-large:where(:not(.is-style-plain)) p{font-size:1.5em;font-style:italic;line-height:1.6}.wp-block-quote.is-large:where(:not(.is-style-plain)) cite,.wp-block-quote.is-large:where(:not(.is-style-plain)) footer,.wp-block-quote.is-style-large:where(:not(.is-style-plain)) cite,.wp-block-quote.is-style-large:where(:not(.is-style-plain)) footer{font-size:1.125em;text-align:right}.wp-block-quote>cite{display:block}
+/*# sourceURL=/wp-includes/blocks/quote/style.min.css */
+</style>
+<style id="wp-block-quote-theme-inline-css" type="text/css">
+.wp-block-quote{border-left:.25em solid;margin:0 0 1.75em;padding-left:1em}.wp-block-quote cite,.wp-block-quote footer{color:currentColor;font-size:.8125em;font-style:normal;position:relative}.wp-block-quote:where(.has-text-align-right){border-left:none;border-right:.25em solid;padding-left:0;padding-right:1em}.wp-block-quote:where(.has-text-align-center){border:none;padding-left:0}.wp-block-quote.is-large,.wp-block-quote.is-style-large,.wp-block-quote:where(.is-style-plain){border:none}
+/*# sourceURL=/wp-includes/blocks/quote/theme.min.css */
+</style>
+
+<style id="classic-theme-styles-inline-css" type="text/css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+<style id="global-styles-inline-css" type="text/css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--dark-gray: #373737;--wp--preset--color--medium-gray: #cccccc;--wp--preset--color--light-gray: #eeeeee;--wp--preset--color--blue: #1982d1;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 14px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 24px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-size--normal: 16px;--wp--preset--font-size--huge: 26px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link rel="stylesheet" id="wp-syntax-css-css" href="/wp-content/plugins/wp-syntax/css/wp-syntax.css?ver=1.2" type="text/css" media="all">
+<link rel="stylesheet" id="genericons-css" href="/wp-content/themes/catch-box/genericons/genericons.css?ver=3.4.1" type="text/css" media="all">
+<link rel="stylesheet" id="catchbox-style-css" href="/wp-content/themes/catch-box/style.css?ver=20260211-144644" type="text/css" media="all">
+<link rel="stylesheet" id="catchbox-block-style-css" href="/wp-content/themes/catch-box/css/blocks.css?ver=1.0" type="text/css" media="all">
+<script type="text/javascript" src="/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script type="text/javascript" id="catchbox-menu-js-extra">
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+//# sourceURL=catchbox-menu-js-extra
+/* ]]> */
+</script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/menu.min.js?ver=2.1.1.1" id="catchbox-menu-js"></script>
+<link rel="https://api.w.org/" href="/wp-json/"><link rel="alternate" title="JSON" type="application/json" href="/wp-json/wp/v2/posts/651"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="/xmlrpc.php?rsd">
+<meta name="generator" content="WordPress 6.9.1">
+<link rel="canonical" href="/2019/02/cstringandbugs/">
+<link rel="shortlink" href="/?p=651">
+<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style></head>
+
+<body class="wp-singular post-template-default single single-post postid-651 single-format-standard wp-embed-responsive wp-theme-catch-box single-author right-sidebar one-menu header-image-top">
+
+    
+    
+    <div id="page" class="hfeed site">
+
+        <a href="#main" class="skip-link screen-reader-text">Skip to content</a>
+        <header id="branding" role="banner">
+
+            
+            <div id="header-content" class="clearfix">
+
+                <div class="logo-wrap clearfix">	<div id="hgroup" class="site-details">
+					<p id="site-title"><a href="/" rel="home">麦田的小黑屋</a></p>
+			
+   	</div><!-- #hgroup -->
+</div><!-- .logo-wrap -->	<form role="search" method="get" class="searchform" action="/">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input type="search" class="search-field" placeholder="Search" value="" name="s" title="Search for:">
+		</label>
+		<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+	</form>
+
+            </div><!-- #header-content -->
+
+                <div class="menu-access-wrap mobile-header-menu clearfix">
+        <div id="mobile-header-left-menu" class="mobile-menu-anchor page-menu">
+            <a href="#mobile-header-left-nav" id="menu-toggle-primary" class="genericon genericon-menu">
+                <span class="mobile-menu-text">Menu</span>
+            </a>
+        </div><!-- #mobile-header-left-menu -->
+            
+        
+        <div id="site-header-menu-primary" class="site-header-menu">
+            <nav id="access" class="main-navigation menu-focus" role="navigation" aria-label="Primary Menu">
+            
+                <h3 class="screen-reader-text">Primary menu</h3>
+                <div class="menu-header-container"><ul class="menu"><li><a href="/">首页</a></li><li class="page_item page-item-2"><a href="/about/">关于</a></li></ul></div><!-- .menu-header-container -->            </nav><!-- #access -->
+        </div><!-- .site-header-menu -->
+
+            </div><!-- .menu-access-wrap -->
+    
+        </header><!-- #branding -->
+
+        
+        
+        <div id="main" class="clearfix">
+
+            
+            <div id="primary" class="content-area">
+
+                
+                <div id="content" role="main">
+                    
+				
+<article id="post-651" class="post-651 post type-post status-publish format-standard hentry category-49">
+	<header class="entry-header">
+		<h1 class="entry-title">C++的各种字符串和常见问题</h1>
+
+		            <div class="entry-meta">
+                <span class="sep">Posted on </span><a href="/2019/02/cstringandbugs/" title="16:17" rel="bookmark"><time class="entry-date updated" datetime="2019-02-24T16:17:33+08:00" pubdate>2019-02-24</time></a><span class="by-author"> <span class="sep"> by </span> <span class="author vcard"><a class="url fn n" href="/author/admin/" title="View all posts by mtian" rel="author">mtian</a></span></span>                                    <span class="sep sep-comment"> — </span>
+                    <span class="comments-link">
+                        <a href="/2019/02/cstringandbugs/#respond">No Comments ↓</a>                    </span>
+                            </div><!-- .entry-meta -->
+			</header><!-- .entry-header -->
+
+	<div class="entry-content">
+		<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #1677ff; margin: 0 0 25px 0; font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;">
+  <p style="margin: 0 0 10px 0; font-size: 16px; color: #333; line-height: 1.6;">
+    后续更新迁移至个人微信公众号：
+  </p>
+  <div style="margin: 10px 0; text-align: center;">
+    <img decoding="async" src="/wp-content/uploads/2026/02/8040ce2f10694766ab96b8b431fd68a9.jpg" alt="微信公众号二维码" style="width: 150px; height: 150px; border: none;">
+  </div>
+  <p style="margin: 10px 0; font-size: 16px; color: #333; line-height: 1.6;">
+    亦有邮箱可供联系：<a href="mailto:274048862@qq.com" style="color: #1677ff; text-decoration: none;">274048862@qq.com</a>
+  </p>
+  <p style="margin: 10px 0 0 0; font-size: 16px; color: #333; line-height: 1.6;">
+    感谢一路支持
+  </p>
+</div>
+<p> Windows C++ 客户端开发中，字符串操作是很常见的。但是字符串类型很多，而且很多坑，工作中发现很多跟字符串相关的BUG。本文总结了一些常用字符串的优缺点，还有坑。 </p>
+
+
+
+<h2 class="wp-block-heading"> 一、陈旧的字符数组 </h2>
+
+
+
+<p> C\C++语言中并没有提供字符串这一个基础类型，所有对于字符串的操作都是使用的字符串的数组。stl 和 atl 中 string 和 CString 也是封装的字符串数组。</p>
+
+
+
+<p> <strong>1、常见使用  </strong></p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       TCHAR szFilePath<span style="color: #008000;">[</span><span style="color: #0000dd;">20</span><span style="color: #008000;">]</span> <span style="color: #000080;">=</span> <span style="color: #008000;">{</span> <span style="color: #0000dd;">0</span> <span style="color: #008000;">}</span><span style="color: #008080;">;</span>
+       TCHAR szDir<span style="color: #008000;">[</span><span style="color: #008000;">]</span> <span style="color: #000080;">=</span> _T<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;c:<span style="color: #000099; font-weight: bold;">\\</span>&quot;</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       TCHAR szFilName<span style="color: #008000;">[</span><span style="color: #008000;">]</span> <span style="color: #000080;">=</span> _T<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;Test.txt&quot;</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       _tcscpy_s<span style="color: #008000;">(</span>szFilePath, _countof<span style="color: #008000;">(</span>szFilePath<span style="color: #008000;">)</span>, szDir<span style="color: #008000;">)</span><span style="color: #008080;">;</span>  <span style="color: #666666;">// 复制</span>
+       _tcsncat_s<span style="color: #008000;">(</span>szFilePath, _countof<span style="color: #008000;">(</span>szFilePath<span style="color: #008000;">)</span>, szFilName, _tcslen<span style="color: #008000;">(</span>szFilName<span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>     <span style="color: #666666;">// 拼接</span>
+       _tcslwr_s<span style="color: #008000;">(</span>szFilePath<span style="color: #008000;">)</span><span style="color: #008080;">;</span> <span style="color: #666666;">// 转换为小写</span>
+       <span style="color: #0000ff;">int</span> nTmp <span style="color: #000080;">=</span> _tcscmp<span style="color: #008000;">(</span>szFilePath, szDir<span style="color: #008000;">)</span><span style="color: #008080;">;</span> <span style="color: #666666;">// 比较</span></pre></td></tr></table><p class="theCode" style="display:none;">       TCHAR szFilePath[20] = { 0 };
+       TCHAR szDir[] = _T(&quot;c:\\&quot;);
+       TCHAR szFilName[] = _T(&quot;Test.txt&quot;);
+       _tcscpy_s(szFilePath, _countof(szFilePath), szDir);  // 复制
+       _tcsncat_s(szFilePath, _countof(szFilePath), szFilName, _tcslen(szFilName));     // 拼接
+       _tcslwr_s(szFilePath); // 转换为小写
+       int nTmp = _tcscmp(szFilePath, szDir); // 比较</p></div>
+
+
+
+
+
+
+<p><strong> 2、优点： </strong></p>
+
+
+
+<p> a、简单明了，完全都是自己控制的。 </p>
+
+
+
+<p> <strong>3、缺点： </strong></p>
+
+
+
+<p> a、相关操作API繁杂无比，部分陈旧API存在安全隐患。比如，单单字符串拷贝就有4个版本：最古老的版本 strcpy，安全系列的 strcpy_s，Windows Shell的 StrCpy，微软自己的 StringCbCopy。其中最古老的 strcpy 存在安全问题，缓冲区溢出漏洞最经常拿来举例的就是这个API，就是下面的例子 </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #0000ff;">void</span> TestFunc<span style="color: #008000;">(</span>LPCTSTR lpszInPath<span style="color: #008000;">)</span>
+<span style="color: #008000;">{</span>      
+       TCHAR szBuf<span style="color: #008000;">[</span><span style="color: #0000dd;">10</span><span style="color: #008000;">]</span><span style="color: #008080;">;</span>
+       _tcscpy<span style="color: #008000;">(</span>szBuf, lpszInPath<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+<span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">void TestFunc(LPCTSTR lpszInPath)
+{      
+       TCHAR szBuf[10];
+       _tcscpy(szBuf, lpszInPath);
+}</p></div>
+
+
+
+
+
+
+<p> 当传入的参数长度大于10的时候，就会造成栈溢出。不过这个API在VS2015中默认情况下会被报错禁止使用。建议在使用这个基础字符串的时候尽量使用 _s 版本的API。 </p>
+
+
+
+<p> b、手工控制长度，容易失误 </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #0000ff;">void</span> TestFunc<span style="color: #008000;">(</span>LPCTSTR lpszInPath<span style="color: #008000;">)</span>
+<span style="color: #008000;">{</span>      
+       TCHAR <span style="color: #000040;">*</span>pBuf <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+       ATLTRY<span style="color: #008000;">(</span>pBuf <span style="color: #000080;">=</span> <span style="color: #0000dd;">new</span> TCHAR<span style="color: #008000;">[</span><span style="color: #0000dd;">10</span><span style="color: #008000;">]</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       <span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span>pBuf<span style="color: #008000;">)</span>
+       <span style="color: #008000;">{</span>
+              _tcscpy_s<span style="color: #008000;">(</span>pBuf, <span style="color: #0000dd;">30</span>, lpszInPath<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+              <span style="color: #0000dd;">delete</span><span style="color: #008000;">[</span><span style="color: #008000;">]</span> pBuf<span style="color: #008080;">;</span>
+              pBuf <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>         
+       <span style="color: #008000;">}</span>
+<span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">void TestFunc(LPCTSTR lpszInPath)
+{      
+       TCHAR *pBuf = NULL;
+       ATLTRY(pBuf = new TCHAR[10]);
+       if (pBuf)
+       {
+              _tcscpy_s(pBuf, 30, lpszInPath);
+              delete[] pBuf;
+              pBuf = NULL;         
+       }
+}</p></div>
+
+
+
+
+
+
+<p> 上面的例子，长度很容易看到填错了，但是实际写代码时，多个API的其他调用，结合字符与字节的差异，很容易出问题。 </p>
+
+
+
+<p> c、手工控制资源申请与释放，容易资源泄漏 </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #0000ff;">void</span> TestFunc<span style="color: #008000;">(</span>LPCTSTR lpszInPath<span style="color: #008000;">)</span>
+<span style="color: #008000;">{</span>      
+       TCHAR <span style="color: #000040;">*</span>pBuf <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+       ATLTRY<span style="color: #008000;">(</span>pBuf <span style="color: #000080;">=</span> <span style="color: #0000dd;">new</span> TCHAR<span style="color: #008000;">[</span><span style="color: #0000dd;">10</span><span style="color: #008000;">]</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       <span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span>pBuf<span style="color: #008000;">)</span>
+       <span style="color: #008000;">{</span>
+              <span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span>TRUE<span style="color: #008000;">)</span>  <span style="color: #666666;">// 某个条件分支</span>
+              <span style="color: #008000;">{</span>
+                     <span style="color: #0000ff;">return</span><span style="color: #008080;">;</span>
+              <span style="color: #008000;">}</span>
+              _tcscpy_s<span style="color: #008000;">(</span>pBuf, <span style="color: #0000dd;">30</span>, lpszInPath<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+              <span style="color: #0000dd;">delete</span><span style="color: #008000;">[</span><span style="color: #008000;">]</span> pBuf<span style="color: #008080;">;</span>
+              pBuf <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>         
+       <span style="color: #008000;">}</span>
+<span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">void TestFunc(LPCTSTR lpszInPath)
+{      
+       TCHAR *pBuf = NULL;
+       ATLTRY(pBuf = new TCHAR[10]);
+       if (pBuf)
+       {
+              if (TRUE)  // 某个条件分支
+              {
+                     return;
+              }
+              _tcscpy_s(pBuf, 30, lpszInPath);
+              delete[] pBuf;
+              pBuf = NULL;         
+       }
+}</p></div>
+
+
+
+
+
+
+<h2 class="wp-block-heading"><strong> 二、正统的 std::string </strong></h2>
+
+
+
+<p> 标准库里面的字符串类，正统，嫡系，很多开源库里面都是这个。</p>
+
+
+
+<p><strong>1、常见使用</strong>  </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       std<span style="color: #008080;">::</span><span style="color: #007788;">string</span> strPath<span style="color: #008080;">;</span>
+       std<span style="color: #008080;">::</span><span style="color: #007788;">string</span> strDir<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;c:<span style="color: #000099; font-weight: bold;">\\</span>&quot;</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       std<span style="color: #008080;">::</span><span style="color: #007788;">string</span> strFileName<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;Test.txt&quot;</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+       strPath <span style="color: #000080;">=</span> strDir <span style="color: #000040;">+</span> strFileName<span style="color: #008080;">;</span> <span style="color: #666666;">// 复制与拼接</span>
+       std<span style="color: #008080;">::</span><span style="color: #007788;">transform</span><span style="color: #008000;">(</span>strPath.<span style="color: #007788;">begin</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span>, strPath.<span style="color: #007788;">end</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span>, strPath.<span style="color: #007788;">begin</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span>, <span style="color: #008080;">::</span><span style="color: #0000dd;">tolower</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span> <span style="color: #666666;">// 最小化</span>
+       <span style="color: #0000ff;">int</span> nTmp <span style="color: #000080;">=</span> strPath.<span style="color: #007788;">compare</span><span style="color: #008000;">(</span>strDir<span style="color: #008000;">)</span><span style="color: #008080;">;</span>      <span style="color: #666666;">// 比较</span></pre></td></tr></table><p class="theCode" style="display:none;">       std::string strPath;
+       std::string strDir(&quot;c:\\&quot;);
+       std::string strFileName(&quot;Test.txt&quot;);
+
+       strPath = strDir + strFileName; // 复制与拼接
+       std::transform(strPath.begin(), strPath.end(), strPath.begin(), ::tolower); // 最小化
+       int nTmp = strPath.compare(strDir);      // 比较</p></div>
+
+
+
+
+
+
+<p><strong> 2、优点： </strong></p>
+
+
+
+<p> a、使用简单，不再需要考虑内存的申请与释放，以及字符串的长度。 </p>
+
+
+
+<p><strong> 3、缺点： </strong></p>
+
+
+
+<p> a、部分操作还是不方便，比如最小化要记住一个长长的函数和参数，嗯，我刚才也是抄的。 </p>
+
+
+
+<h2 class="wp-block-heading"> 三、推荐使用的 CString </h2>
+
+
+
+<p> 微软在 MFC 和 ATL 库里面都有这么一个 CString，有时名字也叫做 CAtlString。 </p>
+
+
+
+<p><strong> 1、常见使用 </strong></p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       CString strPath<span style="color: #008080;">;</span>
+       CString strDir<span style="color: #008000;">(</span>_T<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;c:<span style="color: #000099; font-weight: bold;">\\</span>&quot;</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       CString strFileName<span style="color: #008000;">(</span>_T<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;Test.txt&quot;</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+       strPath <span style="color: #000080;">=</span> strDir <span style="color: #000040;">+</span> strFileName<span style="color: #008080;">;</span> <span style="color: #666666;">// 复制与拼接</span>
+       strPath.<span style="color: #007788;">MakeLower</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span> <span style="color: #666666;">// 最小化</span>
+       <span style="color: #0000ff;">int</span> nTmp <span style="color: #000080;">=</span> strPath.<span style="color: #007788;">CompareNoCase</span><span style="color: #008000;">(</span>strDir<span style="color: #008000;">)</span><span style="color: #008080;">;</span>       <span style="color: #666666;">// 比较</span></pre></td></tr></table><p class="theCode" style="display:none;">       CString strPath;
+       CString strDir(_T(&quot;c:\\&quot;));
+       CString strFileName(_T(&quot;Test.txt&quot;));
+
+       strPath = strDir + strFileName; // 复制与拼接
+       strPath.MakeLower(); // 最小化
+       int nTmp = strPath.CompareNoCase(strDir);       // 比较</p></div>
+
+
+
+
+
+
+<p><strong> 2、优点 </strong></p>
+
+
+
+<p> a、使用方便，能想到的操作几乎都提供了简便的调用，比如最小化、最大化、比较、字符串分割等。 </p>
+
+
+
+<p><strong> 3、缺点： </strong></p>
+
+
+
+<p> a、非C++嫡系，很多类库都是用的 stl::string，用那些库的时候就不能用 CString 了。 </p>
+
+
+
+<p><strong> 4、其他： </strong></p>
+
+
+
+<p> a，这么好用的一个类，看起来很大的样子，会不会占用的内存空间比较大？CString的成员变量是一个 PXSTR m_pszData，但是对于这个对象其实还关联了一个 CStringData。 </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       <span style="color: #0000ff;">struct</span> CStringData
+       <span style="color: #008000;">{</span>
+              IAtlStringMgr<span style="color: #000040;">*</span> pStringMgr<span style="color: #008080;">;</span>
+              <span style="color: #0000ff;">int</span> nDataLength<span style="color: #008080;">;</span>
+              <span style="color: #0000ff;">int</span> nAllocLength<span style="color: #008080;">;</span>
+              <span style="color: #0000ff;">long</span> nRefs<span style="color: #008080;">;</span>
+       <span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">       struct CStringData
+       {
+              IAtlStringMgr* pStringMgr;
+              int nDataLength;
+              int nAllocLength;
+              long nRefs;
+       }</p></div>
+
+
+
+
+
+
+<p> 所以他的大小其实比常规使用字符串多了16个字节（在指针、int、long均为4个字节的场景下）。但是这个 CStringData 带给了我们在某些场景上的便利，比如在下面这样拷贝字符串 </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       CString strPath<span style="color: #008080;">;</span>
+       CString strDir<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;c:<span style="color: #000099; font-weight: bold;">\\</span>&quot;</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       strPath <span style="color: #000080;">=</span> strDir<span style="color: #008080;">;</span> <span style="color: #666666;">// 复制与拼接</span></pre></td></tr></table><p class="theCode" style="display:none;">       CString strPath;
+       CString strDir(&quot;c:\\&quot;);
+       strPath = strDir; // 复制与拼接</p></div>
+
+
+
+
+
+
+<p>其实只是拷贝了指针，并未实际进行拷贝字符串的内容，性能比字符串拷贝更好一些。 </p>
+
+
+
+<p>b，有些系统API要求一个字符串数组，这时怎么处理？使用 <em>GetBuffer </em>或者 <em>GetBufferSetLength</em> 拿到内部的字符串指针传给API，后面记得<em> ReleaseBuffer</em></p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       CString strPath<span style="color: #008080;">;</span>
+       GetCurrentDirectory<span style="color: #008000;">(</span>MAX_PATH, strPath.<span style="color: #007788;">GetBufferSetLength</span><span style="color: #008000;">(</span>MAX_PATH<span style="color: #000040;">+</span><span style="color: #0000dd;">1</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       strPath.<span style="color: #007788;">ReleaseBuffer</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">       CString strPath;
+       GetCurrentDirectory(MAX_PATH, strPath.GetBufferSetLength(MAX_PATH+1));
+       strPath.ReleaseBuffer();</p></div>
+
+
+
+
+
+
+<p> c、如何分割字符串 </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       CAtlString strIds<span style="color: #008000;">(</span>_T<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;1;2;;3&quot;</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       CAtlString strToken<span style="color: #008000;">(</span>_T<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;;&quot;</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       std<span style="color: #008080;">::</span><span style="color: #007788;">vector</span><span style="color: #000080;">&lt;</span>CAtlString<span style="color: #000080;">&gt;</span> vecIds<span style="color: #008080;">;</span>
+       <span style="color: #0000ff;">int</span> nPos <span style="color: #000080;">=</span> <span style="color: #0000dd;">0</span><span style="color: #008080;">;</span>
+       CString strId <span style="color: #000080;">=</span> strIds.<span style="color: #007788;">Tokenize</span><span style="color: #008000;">(</span>_T<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;;&quot;</span><span style="color: #008000;">)</span>, nPos<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       <span style="color: #0000ff;">while</span> <span style="color: #008000;">(</span><span style="color: #000040;">-</span><span style="color: #0000dd;">1</span> <span style="color: #000040;">!</span><span style="color: #000080;">=</span> nPos<span style="color: #008000;">)</span>
+       <span style="color: #008000;">{</span>
+              vecIds.<span style="color: #007788;">push_back</span><span style="color: #008000;">(</span>strId<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+              strId <span style="color: #000080;">=</span> strIds.<span style="color: #007788;">Tokenize</span><span style="color: #008000;">(</span>_T<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;;&quot;</span><span style="color: #008000;">)</span>, nPos<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       <span style="color: #008000;">}</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">       CAtlString strIds(_T(&quot;1;2;;3&quot;));
+       CAtlString strToken(_T(&quot;;&quot;));
+       std::vector&lt;CAtlString&gt; vecIds;
+       int nPos = 0;
+       CString strId = strIds.Tokenize(_T(&quot;;&quot;), nPos);
+       while (-1 != nPos)
+       {
+              vecIds.push_back(strId);
+              strId = strIds.Tokenize(_T(&quot;;&quot;), nPos);
+       };</p></div>
+
+
+
+
+
+
+<h2 class="wp-block-heading"> 四、有些场景要用的 BSTR 和 CComBSTR </h2>
+
+
+
+<p> COM接口的设计是跨语言的，所以他也设计了自己的字符串类型：OLECHAR 和 BSTR。对于 OLECHAR，可以认为是 TCHAR 一样的类型，在不同的场景表示不同的类型，OLECHAR 在 32 位平台就是 WAHCR </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #0000ff;">typedef</span> WCHAR OLECHAR<span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">typedef WCHAR OLECHAR;</p></div>
+
+
+
+
+
+
+<p> BSTR，指向了字符串数组，但是他其实是一个一个指定长度的字符串。在指针前面还有4个字节用于表示他的长度。 </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #0000ff;">typedef</span> _Null_terminated_ OLECHAR<span style="color: #000040;">*</span> BSTR<span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">typedef _Null_terminated_ OLECHAR* BSTR;</p></div>
+
+
+
+
+
+
+<p>虽然 BSTR 是一个不同的类型，但是对于编译器来说，他就是个 WCHAR*，所以使用时，要注意各种类型问题。CComBSTR 是对BSTR的封装。 </p>
+
+
+
+<p><strong> 1、常见使用 </strong></p>
+
+
+
+<p> BSTR 的申请与释放都需要用专门的API，SysAllocString 和 SysFreeString，不过裸用总是最危险的，还是看 CComBSTR 的使用吧： </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       CComBSTR bstrPath<span style="color: #008080;">;</span>
+       CComBSTR bstrDir<span style="color: #008000;">(</span>OLESTR<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;c:<span style="color: #000099; font-weight: bold;">\\</span>&quot;</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       CComBSTR bstrFileName<span style="color: #008000;">(</span>OLESTR<span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;Test.txt&quot;</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       bstrPath <span style="color: #000080;">=</span> bstrDir<span style="color: #008080;">;</span> <span style="color: #666666;">// 复制</span>
+       bstrPath.<span style="color: #007788;">AppendBSTR</span><span style="color: #008000;">(</span>bstrFileName<span style="color: #008000;">)</span><span style="color: #008080;">;</span> <span style="color: #666666;">// 拼接BSTR的时候需要明确指定，因为BSTR内部可以包含NULL字符</span>
+       bstrPath.<span style="color: #007788;">ToLower</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span> <span style="color: #666666;">// 最小化</span>
+       <span style="color: #0000ff;">bool</span> bSame <span style="color: #000080;">=</span> <span style="color: #008000;">(</span>bstrPath <span style="color: #000080;">==</span> bstrDir<span style="color: #008000;">)</span><span style="color: #008080;">;</span>       <span style="color: #666666;">// 比较</span></pre></td></tr></table><p class="theCode" style="display:none;">       CComBSTR bstrPath;
+       CComBSTR bstrDir(OLESTR(&quot;c:\\&quot;));
+       CComBSTR bstrFileName(OLESTR(&quot;Test.txt&quot;));
+       bstrPath = bstrDir; // 复制
+       bstrPath.AppendBSTR(bstrFileName); // 拼接BSTR的时候需要明确指定，因为BSTR内部可以包含NULL字符
+       bstrPath.ToLower(); // 最小化
+       bool bSame = (bstrPath == bstrDir);       // 比较</p></div>
+
+
+
+
+
+
+<p> 虽然 CComBSTR 也提供了比较和拼接等基础操作。但是常见的使用还是在接口中的传递。 </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">HRESULT GetName<span style="color: #008000;">(</span>BSTR<span style="color: #000040;">*</span> pbstrName<span style="color: #008000;">)</span>
+<span style="color: #008000;">{</span>
+       CAtlString strName<span style="color: #008080;">;</span>
+       <span style="color: #666666;">// 对 strName 的各种操作</span>
+       strName <span style="color: #000080;">=</span> <span style="color: #FF0000;">&quot;test&quot;</span><span style="color: #008080;">;</span>
+       CComBSTR bstrName<span style="color: #008000;">(</span>strName<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       <span style="color: #000040;">*</span>pbstrName <span style="color: #000080;">=</span> bstrName.<span style="color: #007788;">Detach</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       <span style="color: #0000ff;">return</span> S_OK<span style="color: #008080;">;</span>
+<span style="color: #008000;">}</span>
+ 
+<span style="color: #666666;">//////////////////////</span>
+<span style="color: #008000;">{</span>
+       CAtlString strName<span style="color: #008080;">;</span>
+       <span style="color: #008000;">{</span>
+              CComBSTR bstrName<span style="color: #008080;">;</span>
+              GetName<span style="color: #008000;">(</span><span style="color: #000040;">&amp;</span>bstrName<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+              strName <span style="color: #000080;">=</span> bstrName<span style="color: #008080;">;</span>
+       <span style="color: #008000;">}</span>
+<span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">HRESULT GetName(BSTR* pbstrName)
+{
+       CAtlString strName;
+       // 对 strName 的各种操作
+       strName = &quot;test&quot;;
+       CComBSTR bstrName(strName);
+       *pbstrName = bstrName.Detach();
+       return S_OK;
+}
+
+//////////////////////
+{
+       CAtlString strName;
+       {
+              CComBSTR bstrName;
+              GetName(&amp;bstrName);
+              strName = bstrName;
+       }
+}</p></div>
+
+
+
+
+
+
+<p> 因为 BSTR 设计就是跨语言使用的，所以跨模块传递也是没有问题的。从实现来来说， SysAllocString 是在进程堆里面申请的内存，所以支持同进程内跨模块的释放。另外，std::string 使用的 CRT 堆，CString 也是用的进程堆，不过不建议用 CString 作为跨模块接口中的类型来使用。 </p>
+
+
+
+<p><strong> 2、优点 </strong></p>
+
+
+
+<p> a、因为是在进程堆里面申请的内存，所以可以安全的跨进程使用。 </p>
+
+
+
+<p> b、相比于系统的 GetSystemDirectory 这种API，长度由字符串本身控制，无需外部指定。不用一次长度不够时再调用一次，被调用方直接搞定了。 </p>
+
+
+
+<p><strong> 3、缺点</strong></p>
+
+
+
+<p> a、可以内含NULL，跟其他字符串使用不一样，忘记的话，可能导致使用时字符串被截断  </p>
+
+
+
+<p> b、申请与释放均需要专门的API，而且开头有字符串长度，跟普通字符串有时存在兼容性问题。比如把一个普通字符串传给一个要BSTR的接口，那个接口可能回去读取前面的长度，然后申请内存，这个就出问题了。或者把BSTR给一个普通字符串的场景，在释放上就存在问题了。 </p>
+
+
+
+<h2 class="wp-block-heading"> 五、常见 bug </h2>
+
+
+
+<p><strong> 1、空指针 </strong></p>
+
+
+
+<p>普通字符串使用注意判空。std::string 用空指针赋值会 crash，CString 不会。另外，空的 std::string 和 CString 返回字符串不是返回的 NULL 指针，而是一个指向只有一个空字符的指针。 </p>
+
+
+
+<p> <strong>2、字符与字节区别 </strong></p>
+
+
+
+<p> 定义 unicode 宏时，一个 TCHAR 的长度是2个字节。如果搞混的话，很容易导致堆破坏。比如下面的代码 </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       LPCTSTR lpszSrc <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+       TCHAR <span style="color: #000040;">*</span>pDstSrc <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+       <span style="color: #666666;">// ........</span>
+       <span style="color: #0000ff;">int</span> nLen <span style="color: #000080;">=</span> <span style="color: #008000;">(</span><span style="color: #0000ff;">int</span><span style="color: #008000;">)</span>_tcslen<span style="color: #008000;">(</span>lpszSrc<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       nLen <span style="color: #000040;">+</span><span style="color: #000080;">=</span> <span style="color: #0000dd;">16</span><span style="color: #008080;">;</span>
+       pDstSrc <span style="color: #000080;">=</span> <span style="color: #008000;">(</span>TCHAR <span style="color: #000040;">*</span><span style="color: #008000;">)</span><span style="color: #0000dd;">malloc</span><span style="color: #008000;">(</span>nLen<span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">       LPCTSTR lpszSrc = NULL;
+       TCHAR *pDstSrc = NULL;
+       // ........
+       int nLen = (int)_tcslen(lpszSrc);
+       nLen += 16;
+       pDstSrc = (TCHAR *)malloc(nLen);</p></div>
+
+
+
+
+
+
+<p><strong> 3、多线程 </strong></p>
+
+
+
+<p>字符串的都不是多线程安全的，在多线程读没有问题，涉及到写是不安全的。实际编码中要注意自己所在的线程环境，并不只是自己开的线程是多线程，很多回调函数也可能是多线程的。 </p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #0000ff;">class</span> ICallBack
+<span style="color: #008000;">{</span>
+<span style="color: #0000ff;">public</span><span style="color: #008080;">:</span>
+       <span style="color: #0000ff;">virtual</span> <span style="color: #0000ff;">void</span> OnPath<span style="color: #008000;">(</span>LPCTSTR lpszPath<span style="color: #008000;">)</span> <span style="color: #000080;">=</span> <span style="color: #0000dd;">0</span><span style="color: #008080;">;</span>
+<span style="color: #008000;">}</span><span style="color: #008080;">;</span>
+<span style="color: #0000ff;">class</span>  CTest <span style="color: #008080;">:</span> <span style="color: #0000ff;">public</span> ICallBack
+<span style="color: #008000;">{</span>
+<span style="color: #0000ff;">public</span><span style="color: #008080;">:</span>
+       <span style="color: #0000ff;">void</span> OnPath<span style="color: #008000;">(</span>LPCTSTR lpszPath<span style="color: #008000;">)</span>
+       <span style="color: #008000;">{</span>
+              m_strPath <span style="color: #000080;">=</span> lpszPath<span style="color: #008080;">;</span>
+       <span style="color: #008000;">}</span>
+ 
+<span style="color: #0000ff;">private</span><span style="color: #008080;">:</span>
+       CAtlString m_strPath<span style="color: #008080;">;</span>
+<span style="color: #008000;">}</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">class ICallBack
+{
+public:
+       virtual void OnPath(LPCTSTR lpszPath) = 0;
+};
+class  CTest : public ICallBack
+{
+public:
+       void OnPath(LPCTSTR lpszPath)
+       {
+              m_strPath = lpszPath;
+       }
+       
+private:
+       CAtlString m_strPath;
+};</p></div>
+
+
+
+
+
+
+<p><strong> 4，字符串末尾的 null 字符 </strong></p>
+
+
+
+<p>很多场景的API都是要求字符串末尾以 null 结尾。特别需要注意一些读取文件后，给第三方库来解析的场景，遇到过多个没有末尾加 null 字符串，导致第三方库读越界的情况。</p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       Json<span style="color: #008080;">::</span><span style="color: #007788;">Value</span> aRoot<span style="color: #008080;">;</span>
+       Json<span style="color: #008080;">::</span><span style="color: #007788;">Reader</span> aJsonReader<span style="color: #008080;">;</span>
+       <span style="color: #0000ff;">char</span> <span style="color: #000040;">*</span>pFileBuf <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+       <span style="color: #0000ff;">int</span> nFileSize <span style="color: #000080;">=</span> <span style="color: #0000dd;">0</span><span style="color: #008080;">;</span>
+       <span style="color: #666666;">// 获取文件大小 赋值 nFileSize</span>
+       ATLTRY<span style="color: #008000;">(</span>pFileBuf <span style="color: #000080;">=</span> <span style="color: #0000dd;">new</span> <span style="color: #0000ff;">char</span><span style="color: #008000;">[</span>nFileSize<span style="color: #008000;">]</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       <span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span><span style="color: #0000ff;">NULL</span> <span style="color: #000040;">!</span><span style="color: #000080;">=</span> pFileBuf<span style="color: #008000;">)</span>
+       <span style="color: #008000;">{</span>
+              <span style="color: #666666;">// 从文件中读取到 pFileBuf ....</span>
+              aJsonReader.<span style="color: #007788;">parse</span><span style="color: #008000;">(</span>pFileBuf, aRoot<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       <span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">       Json::Value aRoot;
+       Json::Reader aJsonReader;
+       char *pFileBuf = NULL;
+       int nFileSize = 0;
+       // 获取文件大小 赋值 nFileSize
+       ATLTRY(pFileBuf = new char[nFileSize]);
+       if (NULL != pFileBuf)
+       {
+              // 从文件中读取到 pFileBuf ....
+              aJsonReader.parse(pFileBuf, aRoot);
+       }</p></div>
+
+
+
+
+
+
+<p>另外，有些 API 是要求两个null  字符的，比如 RegSetValueExA </p>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow"><p>For string-based types, such as REG_SZ, the string must be <strong>null</strong>-terminated. With the REG_MULTI_SZ data type, the string must be terminated with <strong>two null</strong> characters. </p></blockquote>
+
+
+
+<p><strong>5，字符串生命周期 </strong></p>
+
+
+
+<p> 不只是裸用字符串的似乎，用 new 申请的字符串，还有一些其他的情况，比如</p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">CAtlString GetXXXPathFunc<span style="color: #008000;">(</span><span style="color: #008000;">)</span>
+<span style="color: #008000;">{</span>
+       CAtlString strRet<span style="color: #008080;">;</span>
+       <span style="color: #666666;">// .....</span>
+       <span style="color: #0000ff;">return</span> strRet<span style="color: #008080;">;</span>
+<span style="color: #008000;">}</span><span style="color: #008080;">;</span>
+<span style="color: #0000ff;">int</span> main<span style="color: #008000;">(</span><span style="color: #008000;">)</span>
+<span style="color: #008000;">{</span>
+       LPCTSTR lpszTest <span style="color: #000080;">=</span> GetXXXPathFunc<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+       CreateFile<span style="color: #008000;">(</span>lpszTest, .....<span style="color: #008000;">)</span>
+<span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">CAtlString GetXXXPathFunc()
+{
+       CAtlString strRet;
+       // .....
+       return strRet;
+};
+int main()
+{
+       LPCTSTR lpszTest = GetXXXPathFunc();
+       CreateFile(lpszTest, .....)
+}</p></div>
+
+
+
+
+
+
+<p><strong>  6，长度 </strong></p>
+
+
+
+<p> 见过多例未判断源字符串长度导致的访问越界</p>
+
+
+
+
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">       CAtlString strUrl<span style="color: #008080;">;</span>
+       <span style="color: #666666;">// ...</span>
+       TCHAR szUrl<span style="color: #008000;">[</span>MAX_PATH<span style="color: #008000;">]</span> <span style="color: #000080;">=</span> <span style="color: #008000;">{</span> <span style="color: #0000dd;">0</span> <span style="color: #008000;">}</span><span style="color: #008080;">;</span>
+       <span style="color: #0000dd;">memcpy</span><span style="color: #008000;">(</span>szUrl, <span style="color: #008000;">(</span>LPCTSTR<span style="color: #008000;">)</span>strUrl, MAX_PATH<span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">       CAtlString strUrl;
+       // ...
+       TCHAR szUrl[MAX_PATH] = { 0 };
+       memcpy(szUrl, (LPCTSTR)strUrl, MAX_PATH);</p></div>
+
+
+
+
+
+
+<p>以上的坑看起来都挺简单的，但每条都是在实际工作中遇到的，均引发过 crash 的之类的外发BUG，尤其有的导致了堆破坏，耗费了很多人力去查。估计因为开发经常拷贝粘贴代码，有些从外界拷贝的代码质量不不高，而且开发在预估开发时间时，经常预估的时间少很多，导致开发时间紧，压力一大，不仔细检查拷贝的代码，就容易出问题了。 </p>
+
+
+
+<p>另外，还遇到过一些未解之谜，比如曾发现过 CString  MakeLower 和 Format  的 Crash，但最后也没找到原因，而且逐渐消失了。 </p>
+
+
+
+<h2 class="wp-block-heading"> 六、建议 </h2>
+
+
+
+<p>尽量多使用 CString， 注意字符串的生命周期、长度、末尾的 null 字符串，以及多线程操作问题。尽量不要自己手工操作字符数组，一定要用的话，还要注意选用的 api 问题。.std::string，按场景使用。BSTR 因为操作习惯的原因，尽量少用。 </p>
+			</div><!-- .entry-content -->
+
+	<footer class="entry-meta">
+		This entry was posted in <a href="/category/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="category tag">学习笔记</a> by <a href="/author/admin/">mtian</a>. Bookmark the <a href="/2019/02/cstringandbugs/" title="Permalink to C++的各种字符串和常见问题" rel="bookmark">permalink</a>.		
+		
+	</footer><!-- .entry-meta -->
+</article><!-- #post-651 -->
+
+	<div id="comments">
+	
+	
+	
+		<div id="respond" class="comment-respond">
+		<h2 id="reply-title" class="comment-reply-title">发表回复 <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2019/02/cstringandbugs/#respond" style="display:none;">取消回复</a></small></h2><form action="/wp-comments-post.php" method="post" id="commentform" class="comment-form"><p class="comment-notes"><span id="email-notes">您的邮箱地址不会被公开。</span> <span class="required-field-message">必填项已用 <span class="required">*</span> 标注</span></p><p class="comment-form-comment"><label for="comment">评论 <span class="required">*</span></label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required></textarea></p><p class="comment-form-author"><label for="author">Name</label> <span class="required">*</span><input id="author" name="author" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-email"><label for="email">Email</label> <span class="required">*</span><input id="email" name="email" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-url"><label for="url">网站</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200" autocomplete="url"></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="发表评论"> <input type="hidden" name="comment_post_ID" value="651" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="fc2d906da2"></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>Δ<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="233"><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+</div><!-- #comments -->
+	<nav class="navigation post-navigation" aria-label="文章">
+		<h2 class="screen-reader-text">文章导航</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="/2019/01/windows%E5%B9%B3%E5%8F%B0%E4%B8%8Bsqlite%E6%8E%A5%E5%8F%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev"><span class="meta-nav" aria-hidden="true"><span class="nav-icon">←</span> Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">sqlite学习笔记（1）</span></a></div><div class="nav-next"><a href="/2019/02/varname/" rel="next"><span class="meta-nav" aria-hidden="true">Next <span class="nav-icon">→</span></span> <span class="screen-reader-text">Next post:</span> <span class="post-title">为什么我还在用匈牙利命名法</span></a></div></div>
+	</nav>
+		</div><!-- #content -->
+        
+		            
+	</div><!-- #primary -->
+    
+	    
+
+
+		<aside id="secondary" class="sidebar widget-area" role="complementary">
+			<h2 class="screen-reader-text">Primary Sidebar Widget Area</h2>
+			<section id="categories-269971491" class="widget widget_categories"><h2 class="widget-title">分类</h2>
+			<ul>
+					<li class="cat-item cat-item-49"><a href="/category/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="/category/uncategorized/">未分类</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="/category/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/">胡思乱想</a>
+</li>
+			</ul>
+
+			</section>
+		<section id="recent-posts-2" class="widget widget_recent_entries">
+		<h2 class="widget-title">近期文章</h2>
+		<ul>
+											<li>
+					<a href="/2024/04/electron-npm-bug/">electron 应用接入 npm 包的 4 个坑</a>
+									</li>
+											<li>
+					<a href="/2024/04/prefetch-electron/">如何通过预读来加速 Electron 应用启动</a>
+									</li>
+											<li>
+					<a href="/2019/02/varname/">为什么我还在用匈牙利命名法</a>
+									</li>
+											<li>
+					<a href="/2019/02/cstringandbugs/" aria-current="page">C++的各种字符串和常见问题</a>
+									</li>
+											<li>
+					<a href="/2019/01/windows%E5%B9%B3%E5%8F%B0%E4%B8%8Bsqlite%E6%8E%A5%E5%8F%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">sqlite学习笔记（1）</a>
+									</li>
+					</ul>
+
+		</section><section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">近期评论</h2><ul id="recentcomments"><li class="recentcomments"><span class="comment-author-link">Gresces</span> 发表在《<a href="/2011/12/avpbase-dll/comment-page-1/#comment-26846">avpbase.dll的一些学习笔记</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href="http://%E6%97%A0/" class="url" rel="ugc external nofollow">yang</a></span> 发表在《<a href="/2024/04/electron-npm-bug/comment-page-1/#comment-25353">electron 应用接入 npm 包的 4 个坑</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href="https://xfxia.com/138736.html" class="url" rel="ugc external nofollow">对Windows 平台下PE文件数字签名的一些研究 – 小飞侠</a></span> 发表在《<a href="/2015/06/windowspesign/comment-page-1/#comment-25128">对Windows 平台下PE文件数字签名的一些研究</a>》</li><li class="recentcomments"><span class="comment-author-link">hjx</span> 发表在《<a href="/2015/06/windowspesign/comment-page-1/#comment-22651">对Windows 平台下PE文件数字签名的一些研究</a>》</li><li class="recentcomments"><span class="comment-author-link">XUQS</span> 发表在《<a href="/2019/02/varname/comment-page-1/#comment-22503">为什么我还在用匈牙利命名法</a>》</li></ul></section><section id="linkcat-2" class="widget widget_links"><h2 class="widget-title">链接</h2>
+	<ul class="xoxo blogroll">
+<li><a href="http://www.boxcounter.com/" title="Boxcounter的小黑屋" target="_blank">Boxcounter的小黑屋</a></li>
+<li><a href="http://www.xuetr.com/" rel="friend" target="_blank">linxer</a></li>
+
+	</ul>
+</section>
+<section id="meta-2" class="widget widget_meta"><h2 class="widget-title">其他操作</h2>
+		<ul>
+						<li><a href="/wp-login.php">登录</a></li>
+			<li><a href="/feed/">条目 feed</a></li>
+			<li><a href="/comments/feed/">评论 feed</a></li>
+
+			<li><a href="https://cn.wordpress.org/">WordPress.org</a></li>
+		</ul>
+
+		</section>		</aside><!-- #secondary .widget-area -->
+
+	</div><!-- #main -->
+
+	
+	<footer id="colophon" role="contentinfo">
+		
+        <div id="site-generator" class="clearfix">
+
+            
+			<nav class="social-profile" role="navigation" aria-label="Footer Social Links Menu">
+ 		 		<ul>
+				</ul>
+			</nav><!-- .social-profile --><div class="copyright">Copyright © 2026 <a href="/" title="麦田的小黑屋"><span>麦田的小黑屋</span></a>. All Rights Reserved. </div><div class="powered"><span class="theme-name">Theme: Catch Box by </span><span class="theme-author"><a href="https://catchthemes.com/" title="Catch Themes">Catch Themes</a></span></div>
+        </div> <!-- #site-generator -->
+
+	</footer><!-- #colophon -->
+
+</div><!-- #page -->
+
+<a href="#branding" id="scrollup"><span class="screen-reader-text">Scroll Up</span></a>
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/catch-box/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/javascript" src="/wp-content/plugins/wp-syntax/js/wp-syntax.js?ver=1.2" id="wp-syntax-js-js"></script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/skip-link-focus-fix.js?ver=20151112" id="catchbox-skip-link-focus-fix-js"></script>
+<script type="text/javascript" src="/wp-includes/js/comment-reply.min.js?ver=6.9.1" id="comment-reply-js" async="async" data-wp-strategy="async" fetchpriority="low"></script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/catchbox-scrollup.min.js?ver=20072014" id="catchbox-scrollup-js"></script>
+<script defer type="text/javascript" src="/wp-content/plugins/akismet/_inc/akismet-frontend.js?ver=1770655319" id="akismet-frontend-js"></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"/wp-includes/js/wp-emoji-release.min.js?ver=6.9.1"}}
+</script>
+<script type="module">
+/* <![CDATA[ */
+/*! This file is auto-generated */
+const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(window._wpemojiSettings=a,"wpEmojiSettingsSupports"),s=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const a=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===a[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,a){let r;const o=(r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),s=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(e=>{s[e]=t(o,e,n,a)}),s}function r(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}a.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),c.toString(),p.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"});const r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=e=>{i(n=e.data),r.terminate(),t(n)})}catch(e){}i(n=f(s,u,c,p))}t(n)}).then(e=>{for(const n in e)a.supports[n]=e[n],a.supports.everything=a.supports.everything&&a.supports[n],"flag"!==n&&(a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&a.supports[n]);var t;a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&!a.supports.flag,a.supports.everything||((t=a.source||{}).concatemoji?r(t.concatemoji):t.wpemoji&&t.twemoji&&(r(t.twemoji),r(t.wpemoji)))});
+//# sourceURL=/wp-includes/js/wp-emoji-loader.min.js
+/* ]]> */
+</script>
+
+</body>
+</html>

@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head><meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="profile" href="http://gmpg.org/xfn/11">
+    <link rel="pingback" href="/xmlrpc.php">
+    <title>对Windows 平台下PE文件数字签名的一些研究 – 麦田的小黑屋</title>
+<meta name="robots" content="max-image-preview:large">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » Feed" href="/feed/">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » 评论 Feed" href="/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » 对Windows 平台下PE文件数字签名的一些研究 评论 Feed" href="/2015/06/windowspesign/feed/">
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="/wp-json/oembed/1.0/embed?url=https%3A%2F%2F%2F2015%2F06%2Fwindowspesign%2F">
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="/wp-json/oembed/1.0/embed?url=https%3A%2F%2F%2F2015%2F06%2Fwindowspesign%2F&amp;format=xml">
+<style id="wp-img-auto-sizes-contain-inline-css" type="text/css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id="wp-emoji-styles-inline-css" type="text/css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<style id="wp-block-library-inline-css" type="text/css">
+:root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}.has-text-align-center{text-align:center}.has-text-align-left{text-align:left}.has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-wrap:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style*=border-top-color]){border-top-style:solid}html :where([style*=border-right-color]){border-right-style:solid}html :where([style*=border-bottom-color]){border-bottom-style:solid}html :where([style*=border-left-color]){border-left-style:solid}html :where([style*=border-width]){border-style:solid}html :where([style*=border-top-width]){border-top-style:solid}html :where([style*=border-right-width]){border-right-style:solid}html :where([style*=border-bottom-width]){border-bottom-style:solid}html :where([style*=border-left-width]){border-left-style:solid}html :where(img[class*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
+
+/*# sourceURL=wp-block-library-inline-css */
+</style>
+<style id="classic-theme-styles-inline-css" type="text/css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+<style id="global-styles-inline-css" type="text/css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--dark-gray: #373737;--wp--preset--color--medium-gray: #cccccc;--wp--preset--color--light-gray: #eeeeee;--wp--preset--color--blue: #1982d1;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 14px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 24px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-size--normal: 16px;--wp--preset--font-size--huge: 26px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link rel="stylesheet" id="wp-syntax-css-css" href="/wp-content/plugins/wp-syntax/css/wp-syntax.css?ver=1.2" type="text/css" media="all">
+<link rel="stylesheet" id="genericons-css" href="/wp-content/themes/catch-box/genericons/genericons.css?ver=3.4.1" type="text/css" media="all">
+<link rel="stylesheet" id="catchbox-style-css" href="/wp-content/themes/catch-box/style.css?ver=20260211-144644" type="text/css" media="all">
+<link rel="stylesheet" id="catchbox-block-style-css" href="/wp-content/themes/catch-box/css/blocks.css?ver=1.0" type="text/css" media="all">
+<script type="text/javascript" src="/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script type="text/javascript" id="catchbox-menu-js-extra">
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+//# sourceURL=catchbox-menu-js-extra
+/* ]]> */
+</script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/menu.min.js?ver=2.1.1.1" id="catchbox-menu-js"></script>
+<link rel="https://api.w.org/" href="/wp-json/"><link rel="alternate" title="JSON" type="application/json" href="/wp-json/wp/v2/posts/520"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="/xmlrpc.php?rsd">
+<meta name="generator" content="WordPress 6.9.1">
+<link rel="canonical" href="/2015/06/windowspesign/">
+<link rel="shortlink" href="/?p=520">
+<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style></head>
+
+<body class="wp-singular post-template-default single single-post postid-520 single-format-standard wp-embed-responsive wp-theme-catch-box single-author right-sidebar one-menu header-image-top">
+
+    
+    
+    <div id="page" class="hfeed site">
+
+        <a href="#main" class="skip-link screen-reader-text">Skip to content</a>
+        <header id="branding" role="banner">
+
+            
+            <div id="header-content" class="clearfix">
+
+                <div class="logo-wrap clearfix">	<div id="hgroup" class="site-details">
+					<p id="site-title"><a href="/" rel="home">麦田的小黑屋</a></p>
+			
+   	</div><!-- #hgroup -->
+</div><!-- .logo-wrap -->	<form role="search" method="get" class="searchform" action="/">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input type="search" class="search-field" placeholder="Search" value="" name="s" title="Search for:">
+		</label>
+		<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+	</form>
+
+            </div><!-- #header-content -->
+
+                <div class="menu-access-wrap mobile-header-menu clearfix">
+        <div id="mobile-header-left-menu" class="mobile-menu-anchor page-menu">
+            <a href="#mobile-header-left-nav" id="menu-toggle-primary" class="genericon genericon-menu">
+                <span class="mobile-menu-text">Menu</span>
+            </a>
+        </div><!-- #mobile-header-left-menu -->
+            
+        
+        <div id="site-header-menu-primary" class="site-header-menu">
+            <nav id="access" class="main-navigation menu-focus" role="navigation" aria-label="Primary Menu">
+            
+                <h3 class="screen-reader-text">Primary menu</h3>
+                <div class="menu-header-container"><ul class="menu"><li><a href="/">首页</a></li><li class="page_item page-item-2"><a href="/about/">关于</a></li></ul></div><!-- .menu-header-container -->            </nav><!-- #access -->
+        </div><!-- .site-header-menu -->
+
+            </div><!-- .menu-access-wrap -->
+    
+        </header><!-- #branding -->
+
+        
+        
+        <div id="main" class="clearfix">
+
+            
+            <div id="primary" class="content-area">
+
+                
+                <div id="content" role="main">
+                    
+				
+<article id="post-520" class="post-520 post type-post status-publish format-standard hentry category-49">
+	<header class="entry-header">
+		<h1 class="entry-title">对Windows 平台下PE文件数字签名的一些研究</h1>
+
+		            <div class="entry-meta">
+                <span class="sep">Posted on </span><a href="/2015/06/windowspesign/" title="15:46" rel="bookmark"><time class="entry-date updated" datetime="2015-06-06T15:46:33+08:00" pubdate>2015-06-06</time></a><span class="by-author"> <span class="sep"> by </span> <span class="author vcard"><a class="url fn n" href="/author/admin/" title="View all posts by mtian" rel="author">mtian</a></span></span>                                    <span class="sep sep-comment"> — </span>
+                    <span class="comments-link">
+                        <a href="/2015/06/windowspesign/#comments">2 Comments ↓</a>                    </span>
+                            </div><!-- .entry-meta -->
+			</header><!-- .entry-header -->
+
+	<div class="entry-content">
+		<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #1677ff; margin: 0 0 25px 0; font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;">
+  <p style="margin: 0 0 10px 0; font-size: 16px; color: #333; line-height: 1.6;">
+    后续更新迁移至个人微信公众号：
+  </p>
+  <div style="margin: 10px 0; text-align: center;">
+    <img decoding="async" src="/wp-content/uploads/2026/02/8040ce2f10694766ab96b8b431fd68a9.jpg" alt="微信公众号二维码" style="width: 150px; height: 150px; border: none;">
+  </div>
+  <p style="margin: 10px 0; font-size: 16px; color: #333; line-height: 1.6;">
+    亦有邮箱可供联系：<a href="mailto:274048862@qq.com" style="color: #1677ff; text-decoration: none;">274048862@qq.com</a>
+  </p>
+  <p style="margin: 10px 0 0 0; font-size: 16px; color: #333; line-height: 1.6;">
+    感谢一路支持
+  </p>
+</div><p>Windows平台上PE文件的数字签名有两个作用：确保文件来自指定的发布者和文件被签名后没有被修改过。因此有些软件用数字签名来验证文件是否来自家厂商以及文件的完整性，安全软件也经常通过验证文件是否有数字签名来防误报。但是因为windows对于常用的数字签名验证API- WinVerifyTrust实现的问题，以及一些并不恰当的示例代码，很多地方在验证数字签名时存在卡慢或者安全性不高的问题。本文将介绍数字签名的常见使用方法、常见的验证代码、验证原理、以及在使用过程中碰到的问题，并且提出一种在某些场景下安全性更高，速度更快的验证方法，以及其他的一点小东西。有些地方并未完全搞明白，估计有些错误，如有发现的话，欢迎指出，但是喷的时候轻点啊。</p>
+<p> </p>
+<p>目录</p>
+<p><a href="#_Toc419139192">1       如何使用工具给文件加签名验签名… 3</a></p>
+<p><a href="#_Toc419139193">1.1        生成证书… 3</a></p>
+<p><a href="#_Toc419139194">1.2        嵌入式签名… 4</a></p>
+<p><a href="#_Toc419139195">1.3        编录签名… 7</a></p>
+<p><a href="#_Toc419139196">1.4        验证签名… 8</a></p>
+<p><a href="#_Toc419139197">2       常见的验证签名代码… 10</a></p>
+<p><a href="#_Toc419139198">3       验证原理… 14</a></p>
+<p><a href="#_Toc419139199">3.1        嵌入式签名… 14</a></p>
+<p><a href="#_Toc419139200">3.2        编录签名… 20</a></p>
+<p><a href="#_Toc419139201">4       使用时遇到的问题… 21</a></p>
+<p><a href="#_Toc419139202">4.1        WinVerifyTrust API的卡慢… 21</a></p>
+<p><a href="#_Toc419139203">4.2        安全性… 22</a></p>
+<p><a href="#_Toc419139204">4.2.1         恶意软件可能会导入证书到系统中… 22</a></p>
+<p><a href="#_Toc419139205">4.2.2         滥发的证书… 23</a></p>
+<p><a href="#_Toc419139206">5       一种更加快速安全的验证方法和一段验证代码… 24</a></p>
+<p><a href="#_Toc419139207">6       其他… 28</a></p>
+<p><a href="#_Toc419139208">6.1        签名后真的完全不可以修改了？… 28</a></p>
+<p> </p>
+<p> </p>
+<p> </p>
+<h1>1           <a name="_Toc419139192"></a>如何使用工具给文件加签名验签名</h1>
+<h2>1.1   <a name="_Toc419139193"></a>生成证书</h2>
+<p>平时我们对PE文件加签名的时候使用的是从CA签发的证书，但是我们自己测试的时候也可以用微软的证书生成工具makecert可以生成测试用证书。下面的命令第一行成了一个自签名的根证书，然后用根证书签发一个子证书。</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="powershell" style="font-family:monospace;">D:\sign_test<span style="color: pink;">&amp;</span>gt;makecert <span style="color: pink;">-</span>n <span style="color: #800000;">&quot;cn=root&quot;</span> <span style="color: pink;">-</span><span style="color: #008080; font-weight: bold;">r</span> <span style="color: pink;">-</span><span style="color: #008080; font-weight: bold;">sv</span> test_root.pvk test_root.cer
+Succeeded
+D:\sign_test<span style="color: pink;">&amp;</span>gt;makecert <span style="color: pink;">-</span>n <span style="color: #800000;">&quot;cn=child&quot;</span> <span style="color: pink;">-</span>iv test_root.pvk <span style="color: pink;">-</span>ic test_root.cer <span style="color: pink;">-</span><span style="color: #008080; font-weight: bold;">sv</span> test_child.pvk test_child.cer
+Succeeded</pre></td></tr></table><p class="theCode" style="display:none;">D:\sign_test&amp;gt;makecert -n &quot;cn=root&quot; -r -sv test_root.pvk test_root.cer
+Succeeded
+D:\sign_test&amp;gt;makecert -n &quot;cn=child&quot; -iv test_root.pvk -ic test_root.cer -sv test_child.pvk test_child.cer
+Succeeded</p></div>
+
+<p>当然这种证书是不被系统所信任的，需要手动把生成的证书导入到系统。</p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image44.png" alt=""></p>
+<h2>1.2   <a name="_Toc419139194"></a>嵌入式签名</h2>
+<p>使用微软的signtool工具可以对PE文件进行嵌入式签名，执行signtool signwizard即可打开GUI界面进行向导式签名。</p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image45.png" alt=""></p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image46.png" alt=""></p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image47.png" alt=""></p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image48.png" alt=""></p>
+<p>签名后的效果图：</p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image49.png" alt=""></p>
+<p> </p>
+<h2>1.3   <a name="_Toc419139195"></a>编录签名</h2>
+<p>编录签名是将签名数据放到一个后缀为.cat的编录文件中，并不嵌入到PE文件中，所以右键查看文件属性是看不到数字签名这个标签的。这种签名方法可以对任意格式的文件签名，并不局限于PE文件。微软的系统文件基本都是用这种方式签名的，以至于有人会将这个称为微软编录签名，其实这种方式不只微软可以使用。</p>
+<p>①，创建一个cdf文件，以签名7zFM.exe为例：</p>
+<table>
+<tbody>
+<tr>
+<td width="568">[CatalogHeader]Name=softsigntest.cat[CatalogFiles]&lt;hash&gt;7zFM=7zFM.exe</td>
+</tr>
+</tbody>
+</table>
+<p>②，从上一步创建的cdf文件生成cat文件</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="powershell" style="font-family:monospace;">C:\signtest<span style="color: pink;">&amp;</span>gt;makecat <span style="color: pink;">-</span>v softsigntest.cdf
+opened:    softsigntest.cdf
+processing: 7zFM
+Succeeded</pre></td></tr></table><p class="theCode" style="display:none;">C:\signtest&amp;gt;makecat -v softsigntest.cdf
+opened:    softsigntest.cdf
+processing: 7zFM
+Succeeded</p></div>
+
+<p>③，执行signtool signwizard对softsigntest.cat进行签名。</p>
+<p>④，现在验证PE文件的签名的话，还不能通过验证，需要把cat文件导入到系统中。</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="powershell" style="font-family:monospace;">C:\signtest<span style="color: pink;">&amp;</span>gt;signtool verify <span style="color: pink;">-</span>v <span style="color: pink;">-</span>pa <span style="color: pink;">-</span>a 7zFM.exe
+ 
+Verifying: 7zFM.exe
+File is signed <span style="color: #0000FF;">in</span> catalog: C:\WINDOWS\system32\CatRoot\<span style="color: #000000;">{</span>F750E6C3<span style="color: pink;">-</span>38EE<span style="color: pink;">-</span>11D1<span style="color: pink;">-</span>85E5<span style="color: pink;">-</span>
+00C04FC295EE<span style="color: #000000;">}</span>\softsigntest.<span style="color: #008080; font-weight: bold;">cat</span>
+Signing Certificate Chain:
+    Issued to: root
+    Issued by: root
+    Expires:   <span style="color: #804000;">2040</span><span style="color: pink;">-</span><span style="color: #804000;">1</span><span style="color: pink;">-</span><span style="color: #804000;">1</span> <span style="color: #804000;">7</span>:<span style="color: #804000;">59</span>:<span style="color: #804000;">59</span>
+    SHA1 hash: B858A2990D04DED1C72334C9764CB9B0F15DCCC8
+ 
+        Issued to: child
+        Issued by: root
+        Expires:   <span style="color: #804000;">2040</span><span style="color: pink;">-</span><span style="color: #804000;">1</span><span style="color: pink;">-</span><span style="color: #804000;">1</span> <span style="color: #804000;">7</span>:<span style="color: #804000;">59</span>:<span style="color: #804000;">59</span>
+        SHA1 hash: 325ADFF8533B319DD3EF98DB1896FB46456DCD18
+ 
+File is not timestamped.
+Successfully verified: 7zFM.exe
+ 
+Number of files successfully Verified: <span style="color: #804000;">1</span>
+Number of warnings: <span style="color: #804000;">0</span>
+Number of errors: <span style="color: #804000;">0</span></pre></td></tr></table><p class="theCode" style="display:none;">C:\signtest&amp;gt;signtool verify -v -pa -a 7zFM.exe
+
+Verifying: 7zFM.exe
+File is signed in catalog: C:\WINDOWS\system32\CatRoot\{F750E6C3-38EE-11D1-85E5-
+00C04FC295EE}\softsigntest.cat
+Signing Certificate Chain:
+    Issued to: root
+    Issued by: root
+    Expires:   2040-1-1 7:59:59
+    SHA1 hash: B858A2990D04DED1C72334C9764CB9B0F15DCCC8
+
+        Issued to: child
+        Issued by: root
+        Expires:   2040-1-1 7:59:59
+        SHA1 hash: 325ADFF8533B319DD3EF98DB1896FB46456DCD18
+
+File is not timestamped.
+Successfully verified: 7zFM.exe
+
+Number of files successfully Verified: 1
+Number of warnings: 0
+Number of errors: 0</p></div>
+
+<p> </p>
+<h1>2          <a name="_Toc419139197"></a>常见的验证签名代码</h1>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">BOOL CheckFileTrust<span style="color: #008000;">(</span> LPCWSTR lpFileName <span style="color: #008000;">)</span>
+<span style="color: #008000;">{</span>
+	BOOL bRet <span style="color: #000080;">=</span> FALSE<span style="color: #008080;">;</span>
+	WINTRUST_DATA wd <span style="color: #000080;">=</span> <span style="color: #008000;">{</span> <span style="color: #0000dd;">0</span> <span style="color: #008000;">}</span><span style="color: #008080;">;</span>
+	WINTRUST_FILE_INFO wfi <span style="color: #000080;">=</span> <span style="color: #008000;">{</span> <span style="color: #0000dd;">0</span> <span style="color: #008000;">}</span><span style="color: #008080;">;</span>
+	WINTRUST_CATALOG_INFO wci <span style="color: #000080;">=</span> <span style="color: #008000;">{</span> <span style="color: #0000dd;">0</span> <span style="color: #008000;">}</span><span style="color: #008080;">;</span>
+	CATALOG_INFO ci <span style="color: #000080;">=</span> <span style="color: #008000;">{</span> <span style="color: #0000dd;">0</span> <span style="color: #008000;">}</span><span style="color: #008080;">;</span>
+ 
+	HCATADMIN hCatAdmin <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+	<span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span> <span style="color: #000040;">!</span>CryptCATAdminAcquireContext<span style="color: #008000;">(</span> <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>hCatAdmin, <span style="color: #0000ff;">NULL</span>, <span style="color: #0000dd;">0</span> <span style="color: #008000;">)</span> <span style="color: #008000;">)</span>
+	<span style="color: #008000;">{</span>
+		<span style="color: #0000ff;">return</span> FALSE<span style="color: #008080;">;</span>
+	<span style="color: #008000;">}</span>
+ 
+	HANDLE hFile <span style="color: #000080;">=</span> CreateFileW<span style="color: #008000;">(</span> lpFileName, GENERIC_READ, FILE_SHARE_READ,
+		<span style="color: #0000ff;">NULL</span>, OPEN_EXISTING, <span style="color: #0000dd;">0</span>, <span style="color: #0000ff;">NULL</span> <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	<span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span> INVALID_HANDLE_VALUE <span style="color: #000080;">==</span> hFile <span style="color: #008000;">)</span>
+	<span style="color: #008000;">{</span>
+		CryptCATAdminReleaseContext<span style="color: #008000;">(</span> hCatAdmin, <span style="color: #0000dd;">0</span> <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+		<span style="color: #0000ff;">return</span> FALSE<span style="color: #008080;">;</span>
+	<span style="color: #008000;">}</span>
+ 
+	DWORD dwCnt <span style="color: #000080;">=</span> <span style="color: #0000dd;">100</span><span style="color: #008080;">;</span>
+	BYTE byHash<span style="color: #008000;">[</span><span style="color: #0000dd;">100</span><span style="color: #008000;">]</span><span style="color: #008080;">;</span>
+	CryptCATAdminCalcHashFromFileHandle<span style="color: #008000;">(</span> hFile, <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>dwCnt, byHash, <span style="color: #0000dd;">0</span> <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	CloseHandle<span style="color: #008000;">(</span> hFile <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+	LPWSTR pszMemberTag <span style="color: #000080;">=</span> <span style="color: #0000dd;">new</span> WCHAR<span style="color: #008000;">[</span>dwCnt <span style="color: #000040;">*</span> <span style="color: #0000dd;">2</span> <span style="color: #000040;">+</span> <span style="color: #0000dd;">1</span><span style="color: #008000;">]</span><span style="color: #008080;">;</span>
+	<span style="color: #0000ff;">for</span> <span style="color: #008000;">(</span> DWORD dw <span style="color: #000080;">=</span> <span style="color: #0000dd;">0</span><span style="color: #008080;">;</span> dw <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> dwCnt<span style="color: #008080;">;</span> <span style="color: #000040;">++</span>dw <span style="color: #008000;">)</span>
+	<span style="color: #008000;">{</span>
+		wsprintfW<span style="color: #008000;">(</span> <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>pszMemberTag<span style="color: #008000;">[</span>dw <span style="color: #000040;">*</span> <span style="color: #0000dd;">2</span><span style="color: #008000;">]</span>, <span style="color: #FF0000;">L</span><span style="color: #FF0000;">&quot;%02X&quot;</span>, byHash<span style="color: #008000;">[</span>dw<span style="color: #008000;">]</span> <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	<span style="color: #008000;">}</span>
+ 
+	HCATINFO hCatInfo <span style="color: #000080;">=</span> CryptCATAdminEnumCatalogFromHash<span style="color: #008000;">(</span> hCatAdmin,
+		byHash, dwCnt, <span style="color: #0000dd;">0</span>, <span style="color: #0000ff;">NULL</span> <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	<span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span> <span style="color: #0000ff;">NULL</span> <span style="color: #000080;">==</span> hCatInfo <span style="color: #008000;">)</span>   <span style="color: #666666;">// 编录中没有则验证是否有嵌入式签名</span>
+	<span style="color: #008000;">{</span>
+		wfi.<span style="color: #007788;">cbStruct</span>       <span style="color: #000080;">=</span> <span style="color: #0000dd;">sizeof</span><span style="color: #008000;">(</span> WINTRUST_FILE_INFO <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+		wfi.<span style="color: #007788;">pcwszFilePath</span>  <span style="color: #000080;">=</span> lpFileName<span style="color: #008080;">;</span>
+		wfi.<span style="color: #007788;">hFile</span>          <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+		wfi.<span style="color: #007788;">pgKnownSubject</span> <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+ 
+		wd.<span style="color: #007788;">cbStruct</span>            <span style="color: #000080;">=</span> <span style="color: #0000dd;">sizeof</span><span style="color: #008000;">(</span> WINTRUST_DATA <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">dwUnionChoice</span>       <span style="color: #000080;">=</span> WTD_CHOICE_FILE<span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">pFile</span>               <span style="color: #000080;">=</span> <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>wfi<span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">dwUIChoice</span>          <span style="color: #000080;">=</span> WTD_UI_NONE<span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">fdwRevocationChecks</span> <span style="color: #000080;">=</span> WTD_REVOKE_NONE<span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">dwStateAction</span>       <span style="color: #000080;">=</span> WTD_STATEACTION_IGNORE<span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">dwProvFlags</span>         <span style="color: #000080;">=</span> WTD_SAFER_FLAG<span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">hWVTStateData</span>       <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">pwszURLReference</span>    <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+	<span style="color: #008000;">}</span>
+	<span style="color: #0000ff;">else</span>  <span style="color: #666666;">// 编录中有，验证编录文件的签名是否有效</span>
+	<span style="color: #008000;">{</span>
+		CryptCATCatalogInfoFromContext<span style="color: #008000;">(</span> hCatInfo, <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>ci, <span style="color: #0000dd;">0</span> <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+		wci.<span style="color: #007788;">cbStruct</span>             <span style="color: #000080;">=</span> <span style="color: #0000dd;">sizeof</span><span style="color: #008000;">(</span> WINTRUST_CATALOG_INFO <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+		wci.<span style="color: #007788;">pcwszCatalogFilePath</span> <span style="color: #000080;">=</span> ci.<span style="color: #007788;">wszCatalogFile</span><span style="color: #008080;">;</span>
+		wci.<span style="color: #007788;">pcwszMemberFilePath</span>  <span style="color: #000080;">=</span> lpFileName<span style="color: #008080;">;</span>
+		wci.<span style="color: #007788;">pcwszMemberTag</span>       <span style="color: #000080;">=</span> pszMemberTag<span style="color: #008080;">;</span>
+ 
+		wd.<span style="color: #007788;">cbStruct</span>            <span style="color: #000080;">=</span> <span style="color: #0000dd;">sizeof</span><span style="color: #008000;">(</span> WINTRUST_DATA <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">dwUnionChoice</span>       <span style="color: #000080;">=</span> WTD_CHOICE_CATALOG<span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">pCatalog</span>            <span style="color: #000080;">=</span> <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>wci<span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">dwUIChoice</span>          <span style="color: #000080;">=</span> WTD_UI_NONE<span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">fdwRevocationChecks</span> <span style="color: #000080;">=</span> WTD_STATEACTION_VERIFY<span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">dwProvFlags</span>         <span style="color: #000080;">=</span> <span style="color: #0000dd;">0</span><span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">hWVTStateData</span>       <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+		wd.<span style="color: #007788;">pwszURLReference</span>    <span style="color: #000080;">=</span> <span style="color: #0000ff;">NULL</span><span style="color: #008080;">;</span>
+	<span style="color: #008000;">}</span>
+	GUID action <span style="color: #000080;">=</span> WINTRUST_ACTION_GENERIC_VERIFY_V2<span style="color: #008080;">;</span>
+	HRESULT hr  <span style="color: #000080;">=</span> WinVerifyTrust<span style="color: #008000;">(</span> <span style="color: #0000ff;">NULL</span>, <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>action, <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>wd <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	bRet        <span style="color: #000080;">=</span> SUCCEEDED<span style="color: #008000;">(</span> hr <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+	<span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span> <span style="color: #0000ff;">NULL</span> <span style="color: #000040;">!</span><span style="color: #000080;">=</span> hCatInfo <span style="color: #008000;">)</span>
+	<span style="color: #008000;">{</span>
+		CryptCATAdminReleaseCatalogContext<span style="color: #008000;">(</span> hCatAdmin, hCatInfo, <span style="color: #0000dd;">0</span> <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	<span style="color: #008000;">}</span>
+	CryptCATAdminReleaseContext<span style="color: #008000;">(</span> hCatAdmin, <span style="color: #0000dd;">0</span> <span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	<span style="color: #0000dd;">delete</span><span style="color: #008000;">[</span><span style="color: #008000;">]</span> pszMemberTag<span style="color: #008080;">;</span>
+	<span style="color: #0000ff;">return</span> bRet<span style="color: #008080;">;</span>
+<span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">BOOL CheckFileTrust( LPCWSTR lpFileName )
+{
+	BOOL bRet = FALSE;
+	WINTRUST_DATA wd = { 0 };
+	WINTRUST_FILE_INFO wfi = { 0 };
+	WINTRUST_CATALOG_INFO wci = { 0 };
+	CATALOG_INFO ci = { 0 };
+
+	HCATADMIN hCatAdmin = NULL;
+	if ( !CryptCATAdminAcquireContext( &amp;amp;hCatAdmin, NULL, 0 ) )
+	{
+		return FALSE;
+	}
+
+	HANDLE hFile = CreateFileW( lpFileName, GENERIC_READ, FILE_SHARE_READ,
+		NULL, OPEN_EXISTING, 0, NULL );
+	if ( INVALID_HANDLE_VALUE == hFile )
+	{
+		CryptCATAdminReleaseContext( hCatAdmin, 0 );
+		return FALSE;
+	}
+
+	DWORD dwCnt = 100;
+	BYTE byHash[100];
+	CryptCATAdminCalcHashFromFileHandle( hFile, &amp;amp;dwCnt, byHash, 0 );
+	CloseHandle( hFile );
+
+	LPWSTR pszMemberTag = new WCHAR[dwCnt * 2 + 1];
+	for ( DWORD dw = 0; dw &amp;lt; dwCnt; ++dw )
+	{
+		wsprintfW( &amp;amp;pszMemberTag[dw * 2], L&quot;%02X&quot;, byHash[dw] );
+	}
+
+	HCATINFO hCatInfo = CryptCATAdminEnumCatalogFromHash( hCatAdmin,
+		byHash, dwCnt, 0, NULL );
+	if ( NULL == hCatInfo )   // 编录中没有则验证是否有嵌入式签名
+	{
+		wfi.cbStruct       = sizeof( WINTRUST_FILE_INFO );
+		wfi.pcwszFilePath  = lpFileName;
+		wfi.hFile          = NULL;
+		wfi.pgKnownSubject = NULL;
+
+		wd.cbStruct            = sizeof( WINTRUST_DATA );
+		wd.dwUnionChoice       = WTD_CHOICE_FILE;
+		wd.pFile               = &amp;amp;wfi;
+		wd.dwUIChoice          = WTD_UI_NONE;
+		wd.fdwRevocationChecks = WTD_REVOKE_NONE;
+		wd.dwStateAction       = WTD_STATEACTION_IGNORE;
+		wd.dwProvFlags         = WTD_SAFER_FLAG;
+		wd.hWVTStateData       = NULL;
+		wd.pwszURLReference    = NULL;
+	}
+	else  // 编录中有，验证编录文件的签名是否有效
+	{
+		CryptCATCatalogInfoFromContext( hCatInfo, &amp;amp;ci, 0 );
+		wci.cbStruct             = sizeof( WINTRUST_CATALOG_INFO );
+		wci.pcwszCatalogFilePath = ci.wszCatalogFile;
+		wci.pcwszMemberFilePath  = lpFileName;
+		wci.pcwszMemberTag       = pszMemberTag;
+
+		wd.cbStruct            = sizeof( WINTRUST_DATA );
+		wd.dwUnionChoice       = WTD_CHOICE_CATALOG;
+		wd.pCatalog            = &amp;amp;wci;
+		wd.dwUIChoice          = WTD_UI_NONE;
+		wd.fdwRevocationChecks = WTD_STATEACTION_VERIFY;
+		wd.dwProvFlags         = 0;
+		wd.hWVTStateData       = NULL;
+		wd.pwszURLReference    = NULL;
+	}
+	GUID action = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+	HRESULT hr  = WinVerifyTrust( NULL, &amp;amp;action, &amp;amp;wd );
+	bRet        = SUCCEEDED( hr );
+
+	if ( NULL != hCatInfo )
+	{
+		CryptCATAdminReleaseCatalogContext( hCatAdmin, hCatInfo, 0 );
+	}
+	CryptCATAdminReleaseContext( hCatAdmin, 0 );
+	delete[] pszMemberTag;
+	return bRet;
+}</p></div>
+
+<p>这段网上的代码基本流程是没有问题的，很多同学自用验签名代码或许也是从这个抄来的。但是这里也有几个小毛病：</p>
+<p>①，如果只是要验证嵌入式签名的话，对于没有签名或者签名非嵌入式的文件这里会白白进行了整个文件的读取和HASH计算。这段网上的代码基本流程是没有问题的，很多同学自用验签名代码或许也是从这个抄来的。但是这里也有几个小毛病：</p>
+<p>②，有个特殊情况，文件被进行嵌入式签名以后还是可以进行编录签名。如果编录签名失效而嵌入式签名有效的话，这里会返回验证失败。呃，当然，估计一般人没毛病也不会在一个文件上做两种方式的签名。</p>
+<p>③，这里似乎有一处笔误。WINTRUST_DATA::fdwRevocationChecks的赋值在编录签名和嵌入式签名的分支不一样，而且WTD_STATEACTION_VERIFY是给dwStateAction填的枚举值，虽然值是一样的，但这么还是不妥。看到这里的同学可以看看自己的验证代码是不是从这里抄来的，是不是错的一样。</p>
+<p> </p>
+<h1><a name="_Toc419139198"></a>3         验证原理</h1>
+<h2><a name="_Toc419139199"></a>3.1  嵌入式签名</h2>
+<p>数字签名的验证在取出签名后大概分为这几个步骤，首先从PE文件中取出数字签名，然后校验文件本身的签名，然后是校验证书链一直到根证书，最后对比文件摘要是否与数字签名中携带的一致。下面的描述仅针对PE文件的数字签名验证。先上一张微软文档里面的图，大概说明了数字签名在PE文件中所处的位置，以及自身的格式：</p>
+<p><a href="/wp-content/uploads/2015/06/12.png"><img fetchpriority="high" decoding="async" class="aligncenter size-full wp-image-606" src="/wp-content/uploads/2015/06/12.png" alt="12" width="598" height="742" srcset="/wp-content/uploads/2015/06/12.png 598w, /wp-content/uploads/2015/06/12-242x300.png 242w" sizes="(max-width: 598px) 100vw, 598px"></a></p>
+<p>①，取出数字签名</p>
+<p>PE头的Data Directories中Certificate Table里面指明了WIN_CERTIFICATE的存放位置和大小，WIN_CERTIFICATE的bCertificate就是是SignedData格式的签名。</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #0000ff;">typedef</span> <span style="color: #0000ff;">struct</span> _IMAGE_DATA_DIRECTORY <span style="color: #008000;">{</span>
+	DWORD   VirtualAddress<span style="color: #008080;">;</span>  <span style="color: #666666;">// PE文件的偏移</span>
+	DWORD   Size<span style="color: #008080;">;</span>
+<span style="color: #008000;">}</span> IMAGE_DATA_DIRECTORY, <span style="color: #000040;">*</span>PIMAGE_DATA_DIRECTORY<span style="color: #008080;">;</span>
+ 
+<span style="color: #0000ff;">typedef</span> <span style="color: #0000ff;">struct</span> _WIN_CERTIFICATE
+<span style="color: #008000;">{</span>
+	DWORD       dwLength<span style="color: #008080;">;</span> <span style="color: #666666;">// WIN_CERTIFICATE 的长度（含bCertificate的大小）</span>
+	WORD        wRevision<span style="color: #008080;">;</span>
+	WORD        wCertificateType<span style="color: #008080;">;</span>
+	BYTE        bCertificate<span style="color: #008000;">[</span>ANYSIZE_ARRAY<span style="color: #008000;">]</span><span style="color: #008080;">;</span> <span style="color: #666666;">// signedData开始的位置</span>
+ 
+<span style="color: #008000;">}</span> WIN_CERTIFICATE, <span style="color: #000040;">*</span>LPWIN_CERTIFICATE<span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">typedef struct _IMAGE_DATA_DIRECTORY {
+	DWORD   VirtualAddress;  // PE文件的偏移
+	DWORD   Size;
+} IMAGE_DATA_DIRECTORY, *PIMAGE_DATA_DIRECTORY;
+
+typedef struct _WIN_CERTIFICATE
+{
+	DWORD       dwLength; // WIN_CERTIFICATE 的长度（含bCertificate的大小）
+	WORD        wRevision;
+	WORD        wCertificateType;
+	BYTE        bCertificate[ANYSIZE_ARRAY]; // signedData开始的位置
+
+} WIN_CERTIFICATE, *LPWIN_CERTIFICATE;</p></div>
+
+<p>②，校验文件本身的签名</p>
+<p>文件签名本身是遵循PKCS7标准中的SignedData格式，用ASN1表述的格式如下：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">SignedData <span style="color: #008080;">::</span><span style="color: #000080;">=</span> SEQUENCE <span style="color: #008000;">{</span>
+  version Version,
+  digestAlgorithms DigestAlgorithmIdentifiers,
+  contentInfo ContentInfo,  <span style="color: #000040;">--</span> 这个里面包含了PE文件的Hash
+  certificates  <span style="color: #000040;">--</span>证书的数组（不包括根证书）
+    	<span style="color: #008000;">[</span><span style="color: #0000dd;">0</span><span style="color: #008000;">]</span> IMPLICIT ExtendedCertificatesAndCertificates
+       OPTIONAL,
+  Crls
+    <span style="color: #008000;">[</span><span style="color: #0000dd;">1</span><span style="color: #008000;">]</span> IMPLICIT CertificateRevocationLists OPTIONAL,
+  signerInfos SignerInfos <span style="color: #008000;">}</span>  <span style="color: #000040;">--</span> 签名者的信息
+ 
+SignerInfos <span style="color: #008080;">::</span><span style="color: #000080;">=</span> SET OF SignerInfo</pre></td></tr></table><p class="theCode" style="display:none;">SignedData ::= SEQUENCE {
+  version Version,
+  digestAlgorithms DigestAlgorithmIdentifiers,
+  contentInfo ContentInfo,  -- 这个里面包含了PE文件的Hash
+  certificates  --证书的数组（不包括根证书）
+    	[0] IMPLICIT ExtendedCertificatesAndCertificates
+       OPTIONAL,
+  Crls
+    [1] IMPLICIT CertificateRevocationLists OPTIONAL,
+  signerInfos SignerInfos }  -- 签名者的信息
+
+SignerInfos ::= SET OF SignerInfo</p></div>
+
+<p>PKCS7是加密消息的语法标准，后面会提的X509是证书的格式。ASN1是一种描述对象结构的语法，在一行的定义中可以简单的认为前面的是变量名后面的是类型。ASN1并未定义编码方法，后面会提到的DER是一种常见的编码方法。</p>
+<p>SignerInfos的结构如下：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">SignerInfo <span style="color: #008080;">::</span><span style="color: #000080;">=</span> SEQUENCE <span style="color: #008000;">{</span>
+  version Version,
+  issuerAndSerialNumber IssuerAndSerialNumber,
+  digestAlgorithm DigestAlgorithmIdentifier,
+  authenticatedAttributes <span style="color: #000040;">--</span> 内含SignedData中contentInfo的摘要
+    <span style="color: #008000;">[</span><span style="color: #0000dd;">0</span><span style="color: #008000;">]</span> IMPLICIT Attributes OPTIONAL,
+  digestEncryptionAlgorithm
+    DigestEncryptionAlgorithmIdentifier,
+  encryptedDigest EncryptedDigest, <span style="color: #000040;">--</span> 加密后的摘要
+  unauthenticatedAttributes
+    <span style="color: #008000;">[</span><span style="color: #0000dd;">1</span><span style="color: #008000;">]</span> IMPLICIT Attributes OPTIONAL <span style="color: #008000;">}</span>
+IssuerAndSerialNumber <span style="color: #008080;">::</span><span style="color: #000080;">=</span> SEQUENCE <span style="color: #008000;">{</span>
+  issuer Name,
+  serialNumber CertificateSerialNumber <span style="color: #008000;">}</span>
+EncryptedDigest <span style="color: #008080;">::</span><span style="color: #000080;">=</span> OCTET STRING</pre></td></tr></table><p class="theCode" style="display:none;">SignerInfo ::= SEQUENCE {
+  version Version,
+  issuerAndSerialNumber IssuerAndSerialNumber,
+  digestAlgorithm DigestAlgorithmIdentifier,
+  authenticatedAttributes -- 内含SignedData中contentInfo的摘要
+    [0] IMPLICIT Attributes OPTIONAL,
+  digestEncryptionAlgorithm
+    DigestEncryptionAlgorithmIdentifier,
+  encryptedDigest EncryptedDigest, -- 加密后的摘要
+  unauthenticatedAttributes
+    [1] IMPLICIT Attributes OPTIONAL }
+IssuerAndSerialNumber ::= SEQUENCE {
+  issuer Name,
+  serialNumber CertificateSerialNumber }
+EncryptedDigest ::= OCTET STRING</p></div>
+
+<p>authenticatedAttributes包含了contentType和messageDigest，messageDigest内就是对SignedData的ContentInfo做的摘要。对authenticatedAttributes做摘要得到一个DigestInfo结构的数据，DigestInfo的结构如下：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">   DigestInfo <span style="color: #008080;">::</span><span style="color: #000080;">=</span> SEQUENCE <span style="color: #008000;">{</span>
+     digestAlgorithm DigestAlgorithmIdentifier,
+     digest Digest <span style="color: #008000;">}</span>
+ 
+   Digest <span style="color: #008080;">::</span><span style="color: #000080;">=</span> OCTET STRING</pre></td></tr></table><p class="theCode" style="display:none;">   DigestInfo ::= SEQUENCE {
+     digestAlgorithm DigestAlgorithmIdentifier,
+     digest Digest }
+
+   Digest ::= OCTET STRING</p></div>
+
+<p>用IssuerAndSerialNumber找到签名者的证书，使用里面的公钥解密EncryptedDigest得到一个DigestInfo结构（一般是RSA算法），将这个结构与authenticatedAttributes做摘要得到的结构对比，一致的话才进行下一步。</p>
+<p>③，验证证书链</p>
+<p>相关结构如下：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">   <span style="color: #000040;">--</span> X509的证书格式
+   Certificate  <span style="color: #008080;">::</span><span style="color: #000080;">=</span>  SEQUENCE  <span style="color: #008000;">{</span>
+        tbsCertificate       TBSCertificate,   <span style="color: #000040;">--</span> 证书主体
+        signatureAlgorithm   AlgorithmIdentifier,  <span style="color: #000040;">--</span> 签名用的算法，一般为sha1RSA
+        signatureValue       BIT STRING  <span style="color: #008000;">}</span>     <span style="color: #000040;">--</span> 证书的签名
+ 
+   TBSCertificate  <span style="color: #008080;">::</span><span style="color: #000080;">=</span>  SEQUENCE  <span style="color: #008000;">{</span>
+        version         <span style="color: #008000;">[</span><span style="color: #0000dd;">0</span><span style="color: #008000;">]</span>  EXPLICIT Version DEFAULT v1, <span style="color: #000040;">--</span> PE文件数字签名用的版本为<span style="color: #0000dd;">3</span>
+        serialNumber         CertificateSerialNumber,
+        signature            AlgorithmIdentifier,
+        issuer               Name,
+        validity             Validity, <span style="color: #000040;">--</span> 有效期
+        subject              Name,
+        subjectPublicKeyInfo SubjectPublicKeyInfo,  <span style="color: #000040;">--</span> 含有这个证书的公钥
+        issuerUniqueID  <span style="color: #008000;">[</span><span style="color: #0000dd;">1</span><span style="color: #008000;">]</span>  IMPLICIT UniqueIdentifier OPTIONAL,
+                             <span style="color: #000040;">--</span> If present, version MUST be v2 <span style="color: #0000ff;">or</span> v3        
+        subjectUniqueID <span style="color: #008000;">[</span><span style="color: #0000dd;">2</span><span style="color: #008000;">]</span>  IMPLICIT UniqueIdentifier OPTIONAL,
+                             <span style="color: #000040;">--</span> If present, version MUST be v2 <span style="color: #0000ff;">or</span> v3
+        extensions      <span style="color: #008000;">[</span><span style="color: #0000dd;">3</span><span style="color: #008000;">]</span>  EXPLICIT Extensions OPTIONAL  <span style="color: #000040;">--</span> 扩展
+                             <span style="color: #000040;">--</span> If present, version MUST be v3
+        <span style="color: #008000;">}</span>
+ 
+   <span style="color: #000040;">--</span> 含有公钥的信息
+   SubjectPublicKeyInfo  <span style="color: #008080;">::</span><span style="color: #000080;">=</span>  SEQUENCE  <span style="color: #008000;">{</span>
+        algorithm            AlgorithmIdentifier,
+        subjectPublicKey     BIT STRING  <span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">   -- X509的证书格式
+   Certificate  ::=  SEQUENCE  {
+        tbsCertificate       TBSCertificate,   -- 证书主体
+        signatureAlgorithm   AlgorithmIdentifier,  -- 签名用的算法，一般为sha1RSA
+        signatureValue       BIT STRING  }     -- 证书的签名
+
+   TBSCertificate  ::=  SEQUENCE  {
+        version         [0]  EXPLICIT Version DEFAULT v1, -- PE文件数字签名用的版本为3
+        serialNumber         CertificateSerialNumber,
+        signature            AlgorithmIdentifier,
+        issuer               Name,
+        validity             Validity, -- 有效期
+        subject              Name,
+        subjectPublicKeyInfo SubjectPublicKeyInfo,  -- 含有这个证书的公钥
+        issuerUniqueID  [1]  IMPLICIT UniqueIdentifier OPTIONAL,
+                             -- If present, version MUST be v2 or v3        
+        subjectUniqueID [2]  IMPLICIT UniqueIdentifier OPTIONAL,
+                             -- If present, version MUST be v2 or v3
+        extensions      [3]  EXPLICIT Extensions OPTIONAL  -- 扩展
+                             -- If present, version MUST be v3
+        }
+
+   -- 含有公钥的信息
+   SubjectPublicKeyInfo  ::=  SEQUENCE  {
+        algorithm            AlgorithmIdentifier,
+        subjectPublicKey     BIT STRING  }</p></div>
+
+<p>首先构建证书链，从终端签发数字签名的证书一直到自签名的根证书。这时要了解到证书最后一个成员为扩展，扩展是一列其他的数据，其中两项比较重要的是AuthorityKeyIdentifier和SubjectKeyIdentifier，结构分别如下</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">   AuthorityKeyIdentifier <span style="color: #008080;">::</span><span style="color: #000080;">=</span> SEQUENCE <span style="color: #008000;">{</span>
+      keyIdentifier             <span style="color: #008000;">[</span><span style="color: #0000dd;">0</span><span style="color: #008000;">]</span> KeyIdentifier           OPTIONAL,
+      authorityCertIssuer       <span style="color: #008000;">[</span><span style="color: #0000dd;">1</span><span style="color: #008000;">]</span> GeneralNames            OPTIONAL,
+      authorityCertSerialNumber <span style="color: #008000;">[</span><span style="color: #0000dd;">2</span><span style="color: #008000;">]</span> CertificateSerialNumber OPTIONAL  <span style="color: #008000;">}</span>
+ 
+   KeyIdentifier <span style="color: #008080;">::</span><span style="color: #000080;">=</span> OCTET STRING
+ 
+   SubjectKeyIdentifier <span style="color: #008080;">::</span><span style="color: #000080;">=</span> KeyIdentifier</pre></td></tr></table><p class="theCode" style="display:none;">   AuthorityKeyIdentifier ::= SEQUENCE {
+      keyIdentifier             [0] KeyIdentifier           OPTIONAL,
+      authorityCertIssuer       [1] GeneralNames            OPTIONAL,
+      authorityCertSerialNumber [2] CertificateSerialNumber OPTIONAL  }
+
+   KeyIdentifier ::= OCTET STRING
+
+   SubjectKeyIdentifier ::= KeyIdentifier</p></div>
+
+<p>组建证书链时，将把A证书的中的AuthorityKeyIdentifier（简称AKID） 的keyIdentifier、authorityCertIssuer、authorityCertSerialNumber与B证书的SubjectKeyIdentifier（简称SKID）、issuer 、serialNumber分别匹配，如果匹配上则B证书为A证书的签发者。如果A证书的上面三项与自己对应数据匹配上，则A证书为自签名的证书，证书链构建完毕。</p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image50.png" alt="C:\Users\MTIANY~1\AppData\Local\Temp\ScreenClip.png"></p>
+<p>然后，校验证书链中每个证书的签名、有效期和用法（是否可以用于代码签名）。签名验证的算法为证书中的signatureAlgorithm，签名是signatureValue，被签名的数据为tbsCertificate，公钥从父证书的subjectPublicKeyInfo里面拿。</p>
+<p>④，计算PE文件的Hash，并与签名数据中的Hash对比。</p>
+<p>签名数据中的Hash算法和Hash在SignedData的contentInfo中，contentinfo的结构为：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">ContentInfo <span style="color: #008080;">::</span><span style="color: #000080;">=</span> SEQUENCE <span style="color: #008000;">{</span>
+  contentType ContentType,
+  content
+    <span style="color: #008000;">[</span><span style="color: #0000dd;">0</span><span style="color: #008000;">]</span> EXPLICIT ANY DEFINED BY contentType OPTIONAL 
+<span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">ContentInfo ::= SEQUENCE {
+  contentType ContentType,
+  content
+    [0] EXPLICIT ANY DEFINED BY contentType OPTIONAL 
+}</p></div>
+
+<p>contentType 是SPC_INDIRECT_DATA_OBJID (1.3.6.1.4.1.311.2.1.4)，表明了content的类型。content是是一个SpcIndirectDataContent结构的数据。</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">SpcIndirectDataContent <span style="color: #008080;">::</span><span style="color: #000080;">=</span> SEQUENCE <span style="color: #008000;">{</span>
+    data                    SpcAttributeTypeAndOptionalValue,
+    messageDigest           DigestInfo
+<span style="color: #008000;">}</span> <span style="color: #000040;">--</span><span style="color: #339900;">#public—</span>
+ 
+DigestInfo <span style="color: #008080;">::</span><span style="color: #000080;">=</span> SEQUENCE <span style="color: #008000;">{</span>
+    digestAlgorithm     AlgorithmIdentifier,
+    digest              OCTETSTRING
+<span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">SpcIndirectDataContent ::= SEQUENCE {
+    data                    SpcAttributeTypeAndOptionalValue,
+    messageDigest           DigestInfo
+} --#public—
+
+DigestInfo ::= SEQUENCE {
+    digestAlgorithm     AlgorithmIdentifier,
+    digest              OCTETSTRING
+}</p></div>
+
+<p>digestAlgorithm就是Hash算法，一般为sha1。digest就是文件的Hash。</p>
+<p>Hash的计算原则为排除且仅排除掉签名过程中可能会改动的数据以及数字签名本身。大概计算过程如下：</p>
+<p>除去PE头中checksum和Certificate Table计算PE头的HASH（含 Section Table），按每个节偏移的顺序依次对每个节的数据算HASH，对PE附加数据算HASH。附加数据的起始偏移为PE头大小+每个节的大小，附加数据大小=文件大小-（PE头+每个节）-签名的大小，签名的大小是Optional Header Data Directories[Certificate Table].Size。</p>
+<p>另外，由这个Hash算法可以看出，PE文件的签名数据都是放到PE文件最尾部的，因为只有附加数据最末尾一段为签名数据大小的数据是没有计算在PE的Hash内的。</p>
+<h2><a name="_Toc419139200"></a>3.2  编录签名</h2>
+<p>编录文件的签名微软并未公开格式文档，所以大概就是靠微软一些边角的资料去猜。</p>
+<p>编录文件的签名数据格式应该是跟嵌入式签名一样的。这里说下不一样的地方，微软编录文件的签名和PE文件是分开的，cat文件中存放着文件的Hash，而且可以存放多个文件的Hash，对cat文件中的多个Hash进行了一个签名，怀疑微软就是为了这个能节约体积做出来编录签名这个东西。编录签名导入系统后存放在<em>%windir%</em>\system32\catroot。但是这个在验证上就带来了问题，验证某个文件时，那么多cat文件都要打开看下有没有这个文件的Hash？效率太低了吧，微软似乎有个很聪明的作法，做个服务Cryptographic Services都给加载起来嘛，验证的时候跨进程通信来找我。呃，这些都是我猜的，谁知道的话，请告诉我。</p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image51.png" alt="C:\Users\mtian\AppData\Local\Temp\ScreenClip.png"></p>
+<p> </p>
+<h1>4         使用时遇到的问题</h1>
+<h2><a name="_Toc419139202"></a>4.1  WinVerifyTrust API的卡慢</h2>
+<p>WinVerifyTrust，这玩意里面的问题很多。目前已知有在以下几个地方可能有问题。</p>
+<p>①，验证CRL（销证书列表）时使用的WinINet系列API性能不好。这个系列的API是出了名的不稳定，而且据说可能会导致堆破坏，实际使用中我们也发现过因为这里导致卡死的情况，但是找不到DUMP了，└(T_T;)┘。</p>
+<p>②，枚举证书时的卡死，这是我们拿到的一个DUMP，此处卡了近10分钟。</p>
+<p><a href="/wp-content/uploads/2015/06/1.png"><img decoding="async" class="aligncenter size-full wp-image-604" src="/wp-content/uploads/2015/06/1.png" alt="1" width="646" height="83" srcset="/wp-content/uploads/2015/06/1.png 646w, /wp-content/uploads/2015/06/1-300x39.png 300w" sizes="(max-width: 646px) 100vw, 646px"></a></p>
+<p>③，如果验证编录签名的话，我们曾经发现过一个跨进程通信的卡死，在调用栈中可以看到验证签名的线程的栈顶上有几个线程有RPC的字样。</p>
+<p>④，枚举签名时的死循环。据说在XP系统上WinVerfiyTrust在校验PE文件嵌入式签名时，循环枚举签名时没有判断签名的长度，如果PE文件被破坏，签名长度为0的话，WinVerfiyTrust会陷入死循环。</p>
+<p> </p>
+<h2><a name="_Toc419139203"></a>4.2  安全性</h2>
+<h3><a name="_Toc419139204"></a>4.2.1              恶意软件可能会导入证书到系统中</h3>
+<p>恶意软件是在运行后可以通过CertAddCertificateContextToStore自己导入根证书，虽然windows系统会弹出警告框，但是可以模拟点击鼠标来点击警告框的确认。</p>
+<p>下面是一个效果图：</p>
+<p><a href="/wp-content/uploads/2015/06/%E8%87%AA%E5%B7%B1%E5%AF%BC%E5%85%A5%E8%AF%81%E4%B9%A6%E7%9A%84%E5%8A%A8%E7%94%BB1.gif"><img decoding="async" class="aligncenter size-full wp-image-601" src="/wp-content/uploads/2015/06/%E8%87%AA%E5%B7%B1%E5%AF%BC%E5%85%A5%E8%AF%81%E4%B9%A6%E7%9A%84%E5%8A%A8%E7%94%BB1.gif" alt="自己导入证书的动画" width="797" height="572"></a></p>
+<h3><a name="_Toc419139205"></a>4.2.2              滥发的证书</h3>
+<p>一般的CA都是有基本的安全概念的，对于证书的颁发都会比较谨慎。但是某些有途径向用户电脑插入根证书的厂商对于证书的颁发并不谨慎，比如工行网银的U盾中的证书并未限制用途，可以给PE文件签名。见下图</p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image8.jpg" alt="C:\Users\mtian\Desktop\icbc.jpg"></p>
+<p>支付宝以前也爆过这个漏洞，现在已经被补了，下面这个是乌云上的截图。</p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image9.jpg" alt="C:\Users\mtian\Desktop\11144822911e60e1fb23e9f91025d17d916bf90f.jpg"></p>
+<p>这种证书签名的文件在对应装了工行或者支付宝根证书的机器上都是可以通过数字签名验证的，但是由于其证书是颁发给个人的，所以文件并不能认为是安全的。</p>
+<h1><a name="_Toc419139206"></a>5         一种更加快速安全的验证方法和一段验证代码</h1>
+<p>上面说了了数字签名验证在实际使用中的不少问题，那么，如果想快速验证签名而且保证安全的话，那么要怎么办呢？提出的问题主要是在于两点，一个是WinVerfiyTrust的卡慢问题，一个是证书被滥用或者用户环境被污染的问题。那么，要搞的话，可以写验证签名的代码，并且带一个可信的根证书列表下去，验证通过后，将整个证书链所有证书的信息都通过自己的CS协议发送到自己的后台来验证证书是否可信，这样我们还可以通过后台来干掉吊销列表中的证书。</p>
+<p>只是对于PE文件的的签名校验，却有不少代码要写，包括签名数据ASN1编码格式数据的解析，签名的验证和证书链的验证，但是这种通用的代码我们可以从开源库里去找比如OpenSSL，下面是一段东拼西凑抄来的代码，可以验证PE文件的数字签名，但是这段代码很粗糙，有些地方并未完全搞明白，而且为了缩短篇幅去掉了大部分错误处理，轻喷，只是为了试下这条路能不能走通。</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #0000ff;">do</span> 
+<span style="color: #008000;">{</span>
+	LPWIN_CERTIFICATE pCert<span style="color: #008080;">;</span>
+	<span style="color: #666666;">// .. 省略代码，从PE文件获取pCert 的地址	 </span>
+	<span style="color: #0000ff;">const</span> <span style="color: #0000ff;">unsigned</span> <span style="color: #0000ff;">char</span><span style="color: #000040;">*</span> pCertificate <span style="color: #000080;">=</span> pCert<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>bCertificate<span style="color: #008080;">;</span> 
+	DWORD dwPKCS7Len <span style="color: #000080;">=</span> pCert<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>dwLength <span style="color: #000040;">-</span> <span style="color: #0000dd;">offsetof</span><span style="color: #008000;">(</span>WIN_CERTIFICATE, bCertificate<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	PKCS7<span style="color: #000040;">*</span> pPkcs7 <span style="color: #000080;">=</span> d2i_PKCS7<span style="color: #008000;">(</span><span style="color: #0000ff;">NULL</span>, <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>pCertificate, dwPKCS7Len<span style="color: #008000;">)</span><span style="color: #008080;">;</span>  <span style="color: #666666;">// DER编码转换为openssl的内部格式</span>
+ 
+ 
+	<span style="color: #666666;">// 获取PE文件的摘要，这个可以直接调用CryptCATAdminCalcHashFromFileHandle，也可以按照文档的描述来自己计算</span>
+	CAutoVectorPtr pSignSha1<span style="color: #008080;">;</span>
+	DWORD dwSignSha1Len <span style="color: #000080;">=</span> <span style="color: #0000dd;">0</span><span style="color: #008080;">;</span>
+	GetFileHashForSign<span style="color: #008000;">(</span>lpszPEPath, pSignSha1, dwSignSha1Len<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+	<span style="color: #666666;">// 对比文件的HASH与签名中的hash，抄来的代码</span>
+	BOOL bMathc <span style="color: #000080;">=</span> IsHashMatch<span style="color: #008000;">(</span>pPkcs7, pSignSha1, dwSignSha1Len<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	<span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span><span style="color: #000040;">!</span>bTmp<span style="color: #008000;">)</span>
+	<span style="color: #008000;">{</span>
+		<span style="color: #0000dd;">cout</span> <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span><span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> endl <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span><span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> <span style="color: #FF0000;">&quot;PE Image Hash dismatch&quot;</span> <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span><span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> endl<span style="color: #008080;">;</span>
+		<span style="color: #0000ff;">break</span><span style="color: #008080;">;</span>
+	<span style="color: #008000;">}</span>
+	<span style="color: #0000dd;">cout</span> <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span><span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> <span style="color: #FF0000;">&quot;PE Image Hash match&quot;</span> <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span><span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> endl<span style="color: #008080;">;</span>
+ 
+	<span style="color: #666666;">// 把根证书放到X509_STORE中</span>
+	X509_STORE <span style="color: #000040;">*</span>pX509Store <span style="color: #000080;">=</span> X509_STORE_new<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	AddRootCerToStore<span style="color: #008000;">(</span>pX509Store, lpszCertPath<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	X509_STORE_set_purpose<span style="color: #008000;">(</span>pX509Store, X509_PURPOSE_ANY<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+	<span style="color: #666666;">// PKCS7_verify 验证的时候是把内容当做V_ASN1_OCTET_STRING 来验证的，</span>
+	<span style="color: #666666;">// 但PE文件的数字签名里这里是一个V_ASN1_SEQUENCE</span>
+	<span style="color: #666666;">// 所以需要手动把V_ASN1_SEQUENCE 的内容取出来放到BIO 里面给PKCS7_verify 来验证</span>
+	<span style="color: #666666;">// 毕竟openssl不是为了PE文件数字签名验证写的，用起来还是有点别扭的</span>
+	<span style="color: #0000dd;">cout</span> <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span><span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> <span style="color: #FF0000;">&quot;Verifying PKCS #7...&quot;</span><span style="color: #008080;">;</span> 	<span style="color: #0000ff;">int</span> seqhdrlen <span style="color: #000080;">=</span> asn1_simple_hdr_len<span style="color: #008000;">(</span>pPkcs7<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>d.<span style="color: #007788;">sign</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>contents<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>d.<span style="color: #007788;">other</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>value.<span style="color: #007788;">sequence</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>data,
+		pPkcs7<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>d.<span style="color: #007788;">sign</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>contents<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>d.<span style="color: #007788;">other</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>value.<span style="color: #007788;">sequence</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>length<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	BIO<span style="color: #000040;">*</span> pContentBio <span style="color: #000080;">=</span> BIO_new_mem_buf<span style="color: #008000;">(</span>pPkcs7<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>d.<span style="color: #007788;">sign</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>contents<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>d.<span style="color: #007788;">other</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>value.<span style="color: #007788;">sequence</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>data <span style="color: #000040;">+</span> seqhdrlen,
+		pPkcs7<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>d.<span style="color: #007788;">sign</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>contents<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>d.<span style="color: #007788;">other</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>value.<span style="color: #007788;">sequence</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>length <span style="color: #000040;">-</span> seqhdrlen<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+ 
+	<span style="color: #666666;">// 校验数字签名</span>
+	<span style="color: #0000ff;">int</span> nOk <span style="color: #000080;">=</span> PKCS7_verify<span style="color: #008000;">(</span>pPkcs7, pPkcs7<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>d.<span style="color: #007788;">sign</span><span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>cert, pX509Store, pContentBio, <span style="color: #0000ff;">NULL</span>, PKCS7_NOCRL<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+	<span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span><span style="color: #0000dd;">1</span> <span style="color: #000040;">!</span><span style="color: #000080;">=</span> nOk<span style="color: #008000;">)</span>
+	<span style="color: #008000;">{</span>
+		<span style="color: #0000dd;">cout</span> <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span><span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> <span style="color: #FF0000;">&quot;failed&quot;</span> <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span><span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> endl<span style="color: #008080;">;</span>
+	<span style="color: #008000;">}</span>
+	<span style="color: #0000ff;">else</span>
+	<span style="color: #008000;">{</span>
+		<span style="color: #0000dd;">cout</span> <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span><span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> <span style="color: #FF0000;">&quot;ok&quot;</span> <span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span><span style="color: #000040;">&amp;</span>lt<span style="color: #008080;">;</span> endl<span style="color: #008080;">;</span>
+	<span style="color: #008000;">}</span>
+ 
+<span style="color: #008000;">}</span> <span style="color: #0000ff;">while</span> <span style="color: #008000;">(</span><span style="color: #0000dd;">0</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">do 
+{
+	LPWIN_CERTIFICATE pCert;
+	// .. 省略代码，从PE文件获取pCert 的地址	 
+	const unsigned char* pCertificate = pCert-&amp;gt;bCertificate; 
+	DWORD dwPKCS7Len = pCert-&amp;gt;dwLength - offsetof(WIN_CERTIFICATE, bCertificate);
+	PKCS7* pPkcs7 = d2i_PKCS7(NULL, &amp;amp;pCertificate, dwPKCS7Len);  // DER编码转换为openssl的内部格式
+
+
+	// 获取PE文件的摘要，这个可以直接调用CryptCATAdminCalcHashFromFileHandle，也可以按照文档的描述来自己计算
+	CAutoVectorPtr pSignSha1;
+	DWORD dwSignSha1Len = 0;
+	GetFileHashForSign(lpszPEPath, pSignSha1, dwSignSha1Len);
+
+	// 对比文件的HASH与签名中的hash，抄来的代码
+	BOOL bMathc = IsHashMatch(pPkcs7, pSignSha1, dwSignSha1Len);
+	if (!bTmp)
+	{
+		cout &amp;lt;&amp;lt; endl &amp;lt;&amp;lt; &quot;PE Image Hash dismatch&quot; &amp;lt;&amp;lt; endl;
+		break;
+	}
+	cout &amp;lt;&amp;lt; &quot;PE Image Hash match&quot; &amp;lt;&amp;lt; endl;
+
+	// 把根证书放到X509_STORE中
+	X509_STORE *pX509Store = X509_STORE_new();
+	AddRootCerToStore(pX509Store, lpszCertPath);
+	X509_STORE_set_purpose(pX509Store, X509_PURPOSE_ANY);
+
+	// PKCS7_verify 验证的时候是把内容当做V_ASN1_OCTET_STRING 来验证的，
+	// 但PE文件的数字签名里这里是一个V_ASN1_SEQUENCE
+	// 所以需要手动把V_ASN1_SEQUENCE 的内容取出来放到BIO 里面给PKCS7_verify 来验证
+	// 毕竟openssl不是为了PE文件数字签名验证写的，用起来还是有点别扭的
+	cout &amp;lt;&amp;lt; &quot;Verifying PKCS #7...&quot;; 	int seqhdrlen = asn1_simple_hdr_len(pPkcs7-&amp;gt;d.sign-&amp;gt;contents-&amp;gt;d.other-&amp;gt;value.sequence-&amp;gt;data,
+		pPkcs7-&amp;gt;d.sign-&amp;gt;contents-&amp;gt;d.other-&amp;gt;value.sequence-&amp;gt;length);
+	BIO* pContentBio = BIO_new_mem_buf(pPkcs7-&amp;gt;d.sign-&amp;gt;contents-&amp;gt;d.other-&amp;gt;value.sequence-&amp;gt;data + seqhdrlen,
+		pPkcs7-&amp;gt;d.sign-&amp;gt;contents-&amp;gt;d.other-&amp;gt;value.sequence-&amp;gt;length - seqhdrlen);
+
+
+	// 校验数字签名
+	int nOk = PKCS7_verify(pPkcs7, pPkcs7-&amp;gt;d.sign-&amp;gt;cert, pX509Store, pContentBio, NULL, PKCS7_NOCRL);
+	if (1 != nOk)
+	{
+		cout &amp;lt;&amp;lt; &quot;failed&quot; &amp;lt;&amp;lt; endl;
+	}
+	else
+	{
+		cout &amp;lt;&amp;lt; &quot;ok&quot; &amp;lt;&amp;lt; endl;
+	}
+
+} while (0);</p></div>
+
+<p>另外，我还简单的写了一个验证数字签名的小DEMO，拼代码的过程好辛苦的，DEMO效果如图：</p>
+<p><img decoding="async" src="/wp-content/uploads/2015/06/word-image54.png" alt="http://km.oa.com/files/photos/captures/201505/1431350273_1_w655_h738.png"></p>
+<p> </p>
+<h1><a name="_Toc419139207"></a>6         其他</h1>
+<h2><a name="_Toc419139208"></a>6.1  签名后真的完全不可以修改了？</h2>
+<p>从签名验证原理的文件HASH计算过程中，可以看到，PE文件几乎整个的被算了HASH，但是某些地方因为要写入签名相关的数据而被从HASH过程中排除。比如Data Directories中Certificate Table中指定了存放数字签名的位置和大小，这个就没有被计算在HASH过程中，我们可以在文件尾部存放一些数据后，调整Certificate Table中记录的大小。当然，这样的做法并不能对别人签发的PE文件做什么东西，但是我们可以对自己的文件做点事，比如如果文件有在签名后向尾部添加或者修改附加数据的需求，就可以这么做。据说chrome的安装包就在签名后修改PE文件来写入一些安装信息，<a href="http://blog.didierstevens.com/2013/08/13/a-bit-more-than-a-signature/">http://blog.didierstevens.com/2013/08/13/a-bit-more-than-a-signature/</a>。</p>
+<p> </p>
+<p> </p>
+<p><strong>参考资料：</strong></p>
+<p>Windows Authenticode Portable Executable Signature Format：<a href="http://download.microsoft.com/download/9/c/5/9c5b2167-8017-4bae-9fde-d599bac8184a/Authenticode_PE.docx">http://download.microsoft.com/download/9/c/5/9c5b2167-8017-4bae-9fde-d599bac8184a/Authenticode_PE.docx</a></p>
+<p>验证微软数字签名：<a href="http://blog.titilima.com/show-184-1.html">http://blog.titilima.com/show-184-1.html</a></p>
+<p>Event ID 256 — System Catalog Database Integrity：<a href="https://technet.microsoft.com/en-us/library/cc734083(v=ws.10).aspx">https://technet.microsoft.com/en-us/library/cc734083(v=ws.10).aspx</a></p>
+<p>PKCS #7: Cryptographic Message Syntax：<a href="http://www.ietf.org/rfc/rfc2315.txt">http://www.ietf.org/rfc/rfc2315.txt</a></p>
+<p>Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile：<a href="http://www.rfc-editor.org/rfc/rfc5280.txt">http://www.rfc-editor.org/rfc/rfc5280.txt</a></p>
+			</div><!-- .entry-content -->
+
+	<footer class="entry-meta">
+		This entry was posted in <a href="/category/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="category tag">学习笔记</a> by <a href="/author/admin/">mtian</a>. Bookmark the <a href="/2015/06/windowspesign/" title="Permalink to 对Windows 平台下PE文件数字签名的一些研究" rel="bookmark">permalink</a>.		
+		
+	</footer><!-- .entry-meta -->
+</article><!-- #post-520 -->
+
+	<div id="comments">
+	
+	
+			<h2 id="comments-title">
+			2 Replies to “对Windows 平台下PE文件数字签名的一些研究”		</h2>
+
+		
+		<ol class="commentlist">
+				<li class="comment even thread-even depth-1" id="li-comment-22651">
+		<article id="comment-22651" class="comment">
+			<footer class="comment-meta">
+				<div class="comment-author vcard">
+					<img alt="" src="https://secure.gravatar.com/avatar/941ae94bda76349117a67d1a7549a24f7d0a9e0ed38488aa77c70fd1dc0725d6?s=68&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/941ae94bda76349117a67d1a7549a24f7d0a9e0ed38488aa77c70fd1dc0725d6?s=136&amp;d=mm&amp;r=g 2x" class="avatar avatar-68 photo" height="68" width="68" loading="lazy" decoding="async"><span class="fn">hjx</span> on <a href="/2015/06/windowspesign/#comment-22651"><time pubdate datetime="2019-08-11T23:17:46+08:00">2019-08-11 at 23:17</time></a> <span class="says">said:</span>
+									</div><!-- .comment-author .vcard -->
+
+				
+			</footer>
+
+			<div class="comment-content"><p>你好，最近在分析pe文件的签名。你的文章给我了很大帮助。能将你的demo源码给我来一份吗？</p>
+</div>
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="/2015/06/windowspesign/?replytocom=22651#respond" data-commentid="22651" data-postid="520" data-belowelement="comment-22651" data-respondelement="respond" data-replyto="回复给 hjx" aria-label="回复给 hjx">Reply <span>↓</span></a>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="post pingback">
+		<p>Pingback: <a href="https://xfxia.com/138736.html" class="url" rel="ugc external nofollow">对Windows 平台下PE文件数字签名的一些研究 – 小飞侠</a></p>
+	</li><!-- #comment-## -->
+		</ol>
+
+		
+	
+		<div id="respond" class="comment-respond">
+		<h2 id="reply-title" class="comment-reply-title">发表回复 <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2015/06/windowspesign/#respond" style="display:none;">取消回复</a></small></h2><form action="/wp-comments-post.php" method="post" id="commentform" class="comment-form"><p class="comment-notes"><span id="email-notes">您的邮箱地址不会被公开。</span> <span class="required-field-message">必填项已用 <span class="required">*</span> 标注</span></p><p class="comment-form-comment"><label for="comment">评论 <span class="required">*</span></label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required></textarea></p><p class="comment-form-author"><label for="author">Name</label> <span class="required">*</span><input id="author" name="author" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-email"><label for="email">Email</label> <span class="required">*</span><input id="email" name="email" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-url"><label for="url">网站</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200" autocomplete="url"></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="发表评论"> <input type="hidden" name="comment_post_ID" value="520" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="7c4764eb48"></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>Δ<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="46"><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+</div><!-- #comments -->
+	<nav class="navigation post-navigation" aria-label="文章">
+		<h2 class="screen-reader-text">文章导航</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="/2013/08/safesign-dll-hijacking/" rel="prev"><span class="meta-nav" aria-hidden="true"><span class="nav-icon">←</span> Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">SafeSign加密组件 Dll Hijacking（某行网银引入）</span></a></div><div class="nav-next"><a href="/2015/07/%E3%80%8A%E6%8A%8A%E6%97%B6%E9%97%B4%E5%BD%93%E4%BD%9C%E6%9C%8B%E5%8F%8B%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="next"><span class="meta-nav" aria-hidden="true">Next <span class="nav-icon">→</span></span> <span class="screen-reader-text">Next post:</span> <span class="post-title">《把时间当作朋友》读书笔记</span></a></div></div>
+	</nav>
+		</div><!-- #content -->
+        
+		            
+	</div><!-- #primary -->
+    
+	    
+
+
+		<aside id="secondary" class="sidebar widget-area" role="complementary">
+			<h2 class="screen-reader-text">Primary Sidebar Widget Area</h2>
+			<section id="categories-269971491" class="widget widget_categories"><h2 class="widget-title">分类</h2>
+			<ul>
+					<li class="cat-item cat-item-49"><a href="/category/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="/category/uncategorized/">未分类</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="/category/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/">胡思乱想</a>
+</li>
+			</ul>
+
+			</section>
+		<section id="recent-posts-2" class="widget widget_recent_entries">
+		<h2 class="widget-title">近期文章</h2>
+		<ul>
+											<li>
+					<a href="/2024/04/electron-npm-bug/">electron 应用接入 npm 包的 4 个坑</a>
+									</li>
+											<li>
+					<a href="/2024/04/prefetch-electron/">如何通过预读来加速 Electron 应用启动</a>
+									</li>
+											<li>
+					<a href="/2019/02/varname/">为什么我还在用匈牙利命名法</a>
+									</li>
+											<li>
+					<a href="/2019/02/cstringandbugs/">C++的各种字符串和常见问题</a>
+									</li>
+											<li>
+					<a href="/2019/01/windows%E5%B9%B3%E5%8F%B0%E4%B8%8Bsqlite%E6%8E%A5%E5%8F%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">sqlite学习笔记（1）</a>
+									</li>
+					</ul>
+
+		</section><section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">近期评论</h2><ul id="recentcomments"><li class="recentcomments"><span class="comment-author-link">Gresces</span> 发表在《<a href="/2011/12/avpbase-dll/comment-page-1/#comment-26846">avpbase.dll的一些学习笔记</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href="http://%E6%97%A0/" class="url" rel="ugc external nofollow">yang</a></span> 发表在《<a href="/2024/04/electron-npm-bug/comment-page-1/#comment-25353">electron 应用接入 npm 包的 4 个坑</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href="https://xfxia.com/138736.html" class="url" rel="ugc external nofollow">对Windows 平台下PE文件数字签名的一些研究 – 小飞侠</a></span> 发表在《<a href="/2015/06/windowspesign/comment-page-1/#comment-25128">对Windows 平台下PE文件数字签名的一些研究</a>》</li><li class="recentcomments"><span class="comment-author-link">hjx</span> 发表在《<a href="/2015/06/windowspesign/comment-page-1/#comment-22651">对Windows 平台下PE文件数字签名的一些研究</a>》</li><li class="recentcomments"><span class="comment-author-link">XUQS</span> 发表在《<a href="/2019/02/varname/comment-page-1/#comment-22503">为什么我还在用匈牙利命名法</a>》</li></ul></section><section id="linkcat-2" class="widget widget_links"><h2 class="widget-title">链接</h2>
+	<ul class="xoxo blogroll">
+<li><a href="http://www.boxcounter.com/" title="Boxcounter的小黑屋" target="_blank">Boxcounter的小黑屋</a></li>
+<li><a href="http://www.xuetr.com/" rel="friend" target="_blank">linxer</a></li>
+
+	</ul>
+</section>
+<section id="meta-2" class="widget widget_meta"><h2 class="widget-title">其他操作</h2>
+		<ul>
+						<li><a href="/wp-login.php">登录</a></li>
+			<li><a href="/feed/">条目 feed</a></li>
+			<li><a href="/comments/feed/">评论 feed</a></li>
+
+			<li><a href="https://cn.wordpress.org/">WordPress.org</a></li>
+		</ul>
+
+		</section>		</aside><!-- #secondary .widget-area -->
+
+	</div><!-- #main -->
+
+	
+	<footer id="colophon" role="contentinfo">
+		
+        <div id="site-generator" class="clearfix">
+
+            
+			<nav class="social-profile" role="navigation" aria-label="Footer Social Links Menu">
+ 		 		<ul>
+				</ul>
+			</nav><!-- .social-profile --><div class="copyright">Copyright © 2026 <a href="/" title="麦田的小黑屋"><span>麦田的小黑屋</span></a>. All Rights Reserved. </div><div class="powered"><span class="theme-name">Theme: Catch Box by </span><span class="theme-author"><a href="https://catchthemes.com/" title="Catch Themes">Catch Themes</a></span></div>
+        </div> <!-- #site-generator -->
+
+	</footer><!-- #colophon -->
+
+</div><!-- #page -->
+
+<a href="#branding" id="scrollup"><span class="screen-reader-text">Scroll Up</span></a>
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/catch-box/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/javascript" src="/wp-content/plugins/wp-syntax/js/wp-syntax.js?ver=1.2" id="wp-syntax-js-js"></script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/skip-link-focus-fix.js?ver=20151112" id="catchbox-skip-link-focus-fix-js"></script>
+<script type="text/javascript" src="/wp-includes/js/comment-reply.min.js?ver=6.9.1" id="comment-reply-js" async="async" data-wp-strategy="async" fetchpriority="low"></script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/catchbox-scrollup.min.js?ver=20072014" id="catchbox-scrollup-js"></script>
+<script defer type="text/javascript" src="/wp-content/plugins/akismet/_inc/akismet-frontend.js?ver=1770655319" id="akismet-frontend-js"></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"/wp-includes/js/wp-emoji-release.min.js?ver=6.9.1"}}
+</script>
+<script type="module">
+/* <![CDATA[ */
+/*! This file is auto-generated */
+const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(window._wpemojiSettings=a,"wpEmojiSettingsSupports"),s=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const a=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===a[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,a){let r;const o=(r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),s=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(e=>{s[e]=t(o,e,n,a)}),s}function r(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}a.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),c.toString(),p.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"});const r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=e=>{i(n=e.data),r.terminate(),t(n)})}catch(e){}i(n=f(s,u,c,p))}t(n)}).then(e=>{for(const n in e)a.supports[n]=e[n],a.supports.everything=a.supports.everything&&a.supports[n],"flag"!==n&&(a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&a.supports[n]);var t;a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&!a.supports.flag,a.supports.everything||((t=a.source||{}).concatemoji?r(t.concatemoji):t.wpemoji&&t.twemoji&&(r(t.twemoji),r(t.wpemoji)))});
+//# sourceURL=/wp-includes/js/wp-emoji-loader.min.js
+/* ]]> */
+</script>
+
+</body>
+</html>

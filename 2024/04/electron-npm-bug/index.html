@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head><meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="profile" href="http://gmpg.org/xfn/11">
+    <link rel="pingback" href="/xmlrpc.php">
+    <title>electron 应用接入 npm 包的 4 个坑 – 麦田的小黑屋</title>
+<meta name="robots" content="max-image-preview:large">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » Feed" href="/feed/">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » 评论 Feed" href="/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » electron 应用接入 npm 包的 4 个坑 评论 Feed" href="/2024/04/electron-npm-bug/feed/">
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="/wp-json/oembed/1.0/embed?url=https%3A%2F%2F%2F2024%2F04%2Felectron-npm-bug%2F">
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="/wp-json/oembed/1.0/embed?url=https%3A%2F%2F%2F2024%2F04%2Felectron-npm-bug%2F&amp;format=xml">
+<style id="wp-img-auto-sizes-contain-inline-css" type="text/css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id="wp-emoji-styles-inline-css" type="text/css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<style id="wp-block-library-inline-css" type="text/css">
+:root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}.has-text-align-center{text-align:center}.has-text-align-left{text-align:left}.has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-wrap:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style*=border-top-color]){border-top-style:solid}html :where([style*=border-right-color]){border-right-style:solid}html :where([style*=border-bottom-color]){border-bottom-style:solid}html :where([style*=border-left-color]){border-left-style:solid}html :where([style*=border-width]){border-style:solid}html :where([style*=border-top-width]){border-top-style:solid}html :where([style*=border-right-width]){border-right-style:solid}html :where([style*=border-bottom-width]){border-bottom-style:solid}html :where([style*=border-left-width]){border-left-style:solid}html :where(img[class*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
+
+/*# sourceURL=wp-block-library-inline-css */
+</style>
+<style id="wp-block-image-inline-css" type="text/css">
+.wp-block-image>a,.wp-block-image>figure>a{display:inline-block}.wp-block-image img{box-sizing:border-box;height:auto;max-width:100%;vertical-align:bottom}@media not (prefers-reduced-motion){.wp-block-image img.hide{visibility:hidden}.wp-block-image img.show{animation:show-content-image .4s}}.wp-block-image[style*=border-radius] img,.wp-block-image[style*=border-radius]>a{border-radius:inherit}.wp-block-image.has-custom-border img{box-sizing:border-box}.wp-block-image.aligncenter{text-align:center}.wp-block-image.alignfull>a,.wp-block-image.alignwide>a{width:100%}.wp-block-image.alignfull img,.wp-block-image.alignwide img{height:auto;width:100%}.wp-block-image .aligncenter,.wp-block-image .alignleft,.wp-block-image .alignright,.wp-block-image.aligncenter,.wp-block-image.alignleft,.wp-block-image.alignright{display:table}.wp-block-image .aligncenter>figcaption,.wp-block-image .alignleft>figcaption,.wp-block-image .alignright>figcaption,.wp-block-image.aligncenter>figcaption,.wp-block-image.alignleft>figcaption,.wp-block-image.alignright>figcaption{caption-side:bottom;display:table-caption}.wp-block-image .alignleft{float:left;margin:.5em 1em .5em 0}.wp-block-image .alignright{float:right;margin:.5em 0 .5em 1em}.wp-block-image .aligncenter{margin-left:auto;margin-right:auto}.wp-block-image :where(figcaption){margin-bottom:1em;margin-top:.5em}.wp-block-image.is-style-circle-mask img{border-radius:9999px}@supports ((-webkit-mask-image:none) or (mask-image:none)) or (-webkit-mask-image:none){.wp-block-image.is-style-circle-mask img{border-radius:0;-webkit-mask-image:url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/>');mask-image:url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/>');mask-mode:alpha;-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:contain;mask-size:contain}}:root :where(.wp-block-image.is-style-rounded img,.wp-block-image .is-style-rounded img){border-radius:9999px}.wp-block-image figure{margin:0}.wp-lightbox-container{display:flex;flex-direction:column;position:relative}.wp-lightbox-container img{cursor:zoom-in}.wp-lightbox-container img:hover+button{opacity:1}.wp-lightbox-container button{align-items:center;backdrop-filter:blur(16px) saturate(180%);background-color:#5a5a5a40;border:none;border-radius:4px;cursor:zoom-in;display:flex;height:20px;justify-content:center;opacity:0;padding:0;position:absolute;right:16px;text-align:center;top:16px;width:20px;z-index:100}@media not (prefers-reduced-motion){.wp-lightbox-container button{transition:opacity .2s ease}}.wp-lightbox-container button:focus-visible{outline:3px auto #5a5a5a40;outline:3px auto -webkit-focus-ring-color;outline-offset:3px}.wp-lightbox-container button:hover{cursor:pointer;opacity:1}.wp-lightbox-container button:focus{opacity:1}.wp-lightbox-container button:focus,.wp-lightbox-container button:hover,.wp-lightbox-container button:not(:hover):not(:active):not(.has-background){background-color:#5a5a5a40;border:none}.wp-lightbox-overlay{box-sizing:border-box;cursor:zoom-out;height:100vh;left:0;overflow:hidden;position:fixed;top:0;visibility:hidden;width:100%;z-index:100000}.wp-lightbox-overlay .close-button{align-items:center;cursor:pointer;display:flex;justify-content:center;min-height:40px;min-width:40px;padding:0;position:absolute;right:calc(env(safe-area-inset-right) + 16px);top:calc(env(safe-area-inset-top) + 16px);z-index:5000000}.wp-lightbox-overlay .close-button:focus,.wp-lightbox-overlay .close-button:hover,.wp-lightbox-overlay .close-button:not(:hover):not(:active):not(.has-background){background:none;border:none}.wp-lightbox-overlay .lightbox-image-container{height:var(--wp--lightbox-container-height);left:50%;overflow:hidden;position:absolute;top:50%;transform:translate(-50%,-50%);transform-origin:top left;width:var(--wp--lightbox-container-width);z-index:9999999999}.wp-lightbox-overlay .wp-block-image{align-items:center;box-sizing:border-box;display:flex;height:100%;justify-content:center;margin:0;position:relative;transform-origin:0 0;width:100%;z-index:3000000}.wp-lightbox-overlay .wp-block-image img{height:var(--wp--lightbox-image-height);min-height:var(--wp--lightbox-image-height);min-width:var(--wp--lightbox-image-width);width:var(--wp--lightbox-image-width)}.wp-lightbox-overlay .wp-block-image figcaption{display:none}.wp-lightbox-overlay button{background:none;border:none}.wp-lightbox-overlay .scrim{background-color:#fff;height:100%;opacity:.9;position:absolute;width:100%;z-index:2000000}.wp-lightbox-overlay.active{visibility:visible}@media not (prefers-reduced-motion){.wp-lightbox-overlay.active{animation:turn-on-visibility .25s both}.wp-lightbox-overlay.active img{animation:turn-on-visibility .35s both}.wp-lightbox-overlay.show-closing-animation:not(.active){animation:turn-off-visibility .35s both}.wp-lightbox-overlay.show-closing-animation:not(.active) img{animation:turn-off-visibility .25s both}.wp-lightbox-overlay.zoom.active{animation:none;opacity:1;visibility:visible}.wp-lightbox-overlay.zoom.active .lightbox-image-container{animation:lightbox-zoom-in .4s}.wp-lightbox-overlay.zoom.active .lightbox-image-container img{animation:none}.wp-lightbox-overlay.zoom.active .scrim{animation:turn-on-visibility .4s forwards}.wp-lightbox-overlay.zoom.show-closing-animation:not(.active){animation:none}.wp-lightbox-overlay.zoom.show-closing-animation:not(.active) .lightbox-image-container{animation:lightbox-zoom-out .4s}.wp-lightbox-overlay.zoom.show-closing-animation:not(.active) .lightbox-image-container img{animation:none}.wp-lightbox-overlay.zoom.show-closing-animation:not(.active) .scrim{animation:turn-off-visibility .4s forwards}}@keyframes show-content-image{0%{visibility:hidden}99%{visibility:hidden}to{visibility:visible}}@keyframes turn-on-visibility{0%{opacity:0}to{opacity:1}}@keyframes turn-off-visibility{0%{opacity:1;visibility:visible}99%{opacity:0;visibility:visible}to{opacity:0;visibility:hidden}}@keyframes lightbox-zoom-in{0%{transform:translate(calc((-100vw + var(--wp--lightbox-scrollbar-width))/2 + var(--wp--lightbox-initial-left-position)),calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale))}to{transform:translate(-50%,-50%) scale(1)}}@keyframes lightbox-zoom-out{0%{transform:translate(-50%,-50%) scale(1);visibility:visible}99%{visibility:visible}to{transform:translate(calc((-100vw + var(--wp--lightbox-scrollbar-width))/2 + var(--wp--lightbox-initial-left-position)),calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));visibility:hidden}}
+/*# sourceURL=/wp-includes/blocks/image/style.min.css */
+</style>
+<style id="wp-block-image-theme-inline-css" type="text/css">
+:root :where(.wp-block-image figcaption){color:#555;font-size:13px;text-align:center}.is-dark-theme :root :where(.wp-block-image figcaption){color:#ffffffa6}.wp-block-image{margin:0 0 1em}
+/*# sourceURL=/wp-includes/blocks/image/theme.min.css */
+</style>
+<style id="wp-block-code-inline-css" type="text/css">
+.wp-block-code{box-sizing:border-box}.wp-block-code code{
+  /*!rtl:begin:ignore*/direction:ltr;display:block;font-family:inherit;overflow-wrap:break-word;text-align:initial;white-space:pre-wrap
+  /*!rtl:end:ignore*/}
+/*# sourceURL=/wp-includes/blocks/code/style.min.css */
+</style>
+<style id="wp-block-code-theme-inline-css" type="text/css">
+.wp-block-code{border:1px solid #ccc;border-radius:4px;font-family:Menlo,Consolas,monaco,monospace;padding:.8em 1em}
+/*# sourceURL=/wp-includes/blocks/code/theme.min.css */
+</style>
+<style id="wp-block-paragraph-inline-css" type="text/css">
+.is-small-text{font-size:.875em}.is-regular-text{font-size:1em}.is-large-text{font-size:2.25em}.is-larger-text{font-size:3em}.has-drop-cap:not(:focus):first-letter{float:left;font-size:8.4em;font-style:normal;font-weight:100;line-height:.68;margin:.05em .1em 0 0;text-transform:uppercase}body.rtl .has-drop-cap:not(:focus):first-letter{float:none;margin-left:.1em}p.has-drop-cap.has-background{overflow:hidden}:root :where(p.has-background){padding:1.25em 2.375em}:where(p.has-text-color:not(.has-link-color)) a{color:inherit}p.has-text-align-left[style*="writing-mode:vertical-lr"],p.has-text-align-right[style*="writing-mode:vertical-rl"]{rotate:180deg}
+/*# sourceURL=/wp-includes/blocks/paragraph/style.min.css */
+</style>
+
+<style id="classic-theme-styles-inline-css" type="text/css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+<style id="global-styles-inline-css" type="text/css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--dark-gray: #373737;--wp--preset--color--medium-gray: #cccccc;--wp--preset--color--light-gray: #eeeeee;--wp--preset--color--blue: #1982d1;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 14px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 24px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-size--normal: 16px;--wp--preset--font-size--huge: 26px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link rel="stylesheet" id="wp-syntax-css-css" href="/wp-content/plugins/wp-syntax/css/wp-syntax.css?ver=1.2" type="text/css" media="all">
+<link rel="stylesheet" id="genericons-css" href="/wp-content/themes/catch-box/genericons/genericons.css?ver=3.4.1" type="text/css" media="all">
+<link rel="stylesheet" id="catchbox-style-css" href="/wp-content/themes/catch-box/style.css?ver=20260211-144644" type="text/css" media="all">
+<link rel="stylesheet" id="catchbox-block-style-css" href="/wp-content/themes/catch-box/css/blocks.css?ver=1.0" type="text/css" media="all">
+<script type="text/javascript" src="/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script type="text/javascript" id="catchbox-menu-js-extra">
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+//# sourceURL=catchbox-menu-js-extra
+/* ]]> */
+</script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/menu.min.js?ver=2.1.1.1" id="catchbox-menu-js"></script>
+<link rel="https://api.w.org/" href="/wp-json/"><link rel="alternate" title="JSON" type="application/json" href="/wp-json/wp/v2/posts/692"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="/xmlrpc.php?rsd">
+<meta name="generator" content="WordPress 6.9.1">
+<link rel="canonical" href="/2024/04/electron-npm-bug/">
+<link rel="shortlink" href="/?p=692">
+<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style></head>
+
+<body class="wp-singular post-template-default single single-post postid-692 single-format-standard wp-embed-responsive wp-theme-catch-box single-author right-sidebar one-menu header-image-top">
+
+    
+    
+    <div id="page" class="hfeed site">
+
+        <a href="#main" class="skip-link screen-reader-text">Skip to content</a>
+        <header id="branding" role="banner">
+
+            
+            <div id="header-content" class="clearfix">
+
+                <div class="logo-wrap clearfix">	<div id="hgroup" class="site-details">
+					<p id="site-title"><a href="/" rel="home">麦田的小黑屋</a></p>
+			
+   	</div><!-- #hgroup -->
+</div><!-- .logo-wrap -->	<form role="search" method="get" class="searchform" action="/">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input type="search" class="search-field" placeholder="Search" value="" name="s" title="Search for:">
+		</label>
+		<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+	</form>
+
+            </div><!-- #header-content -->
+
+                <div class="menu-access-wrap mobile-header-menu clearfix">
+        <div id="mobile-header-left-menu" class="mobile-menu-anchor page-menu">
+            <a href="#mobile-header-left-nav" id="menu-toggle-primary" class="genericon genericon-menu">
+                <span class="mobile-menu-text">Menu</span>
+            </a>
+        </div><!-- #mobile-header-left-menu -->
+            
+        
+        <div id="site-header-menu-primary" class="site-header-menu">
+            <nav id="access" class="main-navigation menu-focus" role="navigation" aria-label="Primary Menu">
+            
+                <h3 class="screen-reader-text">Primary menu</h3>
+                <div class="menu-header-container"><ul class="menu"><li><a href="/">首页</a></li><li class="page_item page-item-2"><a href="/about/">关于</a></li></ul></div><!-- .menu-header-container -->            </nav><!-- #access -->
+        </div><!-- .site-header-menu -->
+
+            </div><!-- .menu-access-wrap -->
+    
+        </header><!-- #branding -->
+
+        
+        
+        <div id="main" class="clearfix">
+
+            
+            <div id="primary" class="content-area">
+
+                
+                <div id="content" role="main">
+                    
+				
+<article id="post-692" class="post-692 post type-post status-publish format-standard hentry category-49">
+	<header class="entry-header">
+		<h1 class="entry-title">electron 应用接入 npm 包的 4 个坑</h1>
+
+		            <div class="entry-meta">
+                <span class="sep">Posted on </span><a href="/2024/04/electron-npm-bug/" title="22:32" rel="bookmark"><time class="entry-date updated" datetime="2024-04-29T22:32:44+08:00" pubdate>2024-04-29</time></a><span class="by-author"> <span class="sep"> by </span> <span class="author vcard"><a class="url fn n" href="/author/admin/" title="View all posts by mtian" rel="author">mtian</a></span></span>                                    <span class="sep sep-comment"> — </span>
+                    <span class="comments-link">
+                        <a href="/2024/04/electron-npm-bug/#comments">1 Comment ↓</a>                    </span>
+                            </div><!-- .entry-meta -->
+			</header><!-- .entry-header -->
+
+	<div class="entry-content">
+		<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #1677ff; margin: 0 0 25px 0; font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;">
+  <p style="margin: 0 0 10px 0; font-size: 16px; color: #333; line-height: 1.6;">
+    后续更新迁移至个人微信公众号：
+  </p>
+  <div style="margin: 10px 0; text-align: center;">
+    <img decoding="async" src="/wp-content/uploads/2026/02/8040ce2f10694766ab96b8b431fd68a9.jpg" alt="微信公众号二维码" style="width: 150px; height: 150px; border: none;">
+  </div>
+  <p style="margin: 10px 0; font-size: 16px; color: #333; line-height: 1.6;">
+    亦有邮箱可供联系：<a href="mailto:274048862@qq.com" style="color: #1677ff; text-decoration: none;">274048862@qq.com</a>
+  </p>
+  <p style="margin: 10px 0 0 0; font-size: 16px; color: #333; line-height: 1.6;">
+    感谢一路支持
+  </p>
+</div>
+<p><section style="line-height: 1.75em"><strong><span style="font-size: 15px;letter-spacing: 1px">一、背景</span></strong></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">Electron 为开发者带来很大的便利，其跨平台特性使我们可以用 JavaScript、HTML 和 CSS 来创建桌面应用。同时， Electron 应用也可以依赖 npm 包增强功能。然而，当我们在 Electron 应用中接入这些 npm 包时，可能会遇到一些坑。</span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">本文详细介绍 Electron 应用中接入 npm 包时可能遇到的 4 个坑。希望通过这篇文章，帮读者避开这些坑，更有效地开发和优化 Electron 应用。</span><span style="font-size: 15px;letter-spacing: 1px"></span></section><section style="line-height: 1.75em"><strong><span style="font-size: 15px;letter-spacing: 1px">二、常见的 4 个坑</span></strong></section><section style="line-height: 1.75em"><strong><span style="font-size: 15px;letter-spacing: 1px">1、PE 文件释放到 temp 目录</span></strong></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">electron 为了提升 require 的性能，设计出了asar。但是 dll 和 exe，或者说改后缀为 .node 的 pe 文件，却无法通过 asar 读取运行。因此，若这些文件被打包至 asar，electron 会先将文件释放至 temp 路径，然后再加载运行。</span></section></p>
+
+
+
+<figure class="wp-block-image size-full"><a href="/wp-content/uploads/2024/04/image-6.png"><img fetchpriority="high" decoding="async" width="1015" height="468" src="/wp-content/uploads/2024/04/image-6.png" alt="" class="wp-image-693" srcset="/wp-content/uploads/2024/04/image-6.png 1015w, /wp-content/uploads/2024/04/image-6-300x138.png 300w, /wp-content/uploads/2024/04/image-6-768x354.png 768w" sizes="(max-width: 1015px) 100vw, 1015px"></a></figure>
+
+
+
+<p><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">这种释放和写入文件的 I/O 操作无疑会对性能造成影响，同时，temp 路径下的 pe 文件加载也是安全软件的重点监控对象，有可能受到拦截的风险。</span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">解决方法是在打包asar时，将.node文件设置为不打包。例如</span></section></p>
+
+
+
+<pre class="wp-block-code"><code>
+  "build": {
+    "electronVersion": "20.1.0",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "asarUnpack": [
+      "node_modules/ffi-napi/**/*.node",
+      "node_modules/ref-napi/**/*.node"
+    ]
+  },</code></pre>
+
+
+
+<p>设置后，.node 文件将在安装时直接释放至 resources\app.asar.unpacked\node_modules 目录下。</p>
+
+
+
+<figure class="wp-block-image size-large"><a href="/wp-content/uploads/2024/04/image-7.png"><img decoding="async" width="1024" height="257" src="/wp-content/uploads/2024/04/image-7-1024x257.png" alt="" class="wp-image-694" srcset="/wp-content/uploads/2024/04/image-7-1024x257.png 1024w, /wp-content/uploads/2024/04/image-7-300x75.png 300w, /wp-content/uploads/2024/04/image-7-768x193.png 768w, /wp-content/uploads/2024/04/image-7.png 1080w" sizes="(max-width: 1024px) 100vw, 1024px"></a></figure>
+
+
+
+<p><section style="line-height: 1.75em"><strong><span style="font-size: 15px;letter-spacing: 1px">2、pdb 文件缺失</span></strong></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">npm 包的引入有两种方式：本机编译和采用官方发布的二进制文件。但往往官方发布的二进制文件并未提供 pdb 文件，一旦 .node 文件出现 crash，问题的定位极其困难。本机编译方式也存在类似问题，许多开发者对 pdb 文件概念并不了解，或者像上述 ffi 示例，编译流程完全自动化，开发者往往忽略了保存 pdb 文件的步骤。</span></section><section style="line-height: 1.75em"><strong><span style="font-size: 15px;letter-spacing: 1px">3、动态链接运行时库</span></strong></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">动态与静态链接运行时库是技术上的选择，各有利弊，在桌面开发中都会被使用。动态链接运行时库后，只需保证软件打包时正确带有运行时库即可。但前端开发者通常不了解运行时库的概念，也无法识别.node文件对于运行时库的链接方式。在 .node 文件使用了动态链接运行时库并且没有带运行时库文件的情况下，就可能导致应用在部分用户机器上无法运行，尤其是某些 Windows 7 用户。</span></section><section style="line-height: 1.75em"><strong><span style="font-size: 15px;letter-spacing: 1px">4、主线程起进程</span></strong></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">有经验的 Windows C++ 程序员应该熟知，需要谨慎让主线程执行任务，比如避免 I/O 操作或者启动进程等，否则可能会引发主线程阻塞，导致用户界面无响应。然而，不少 npm 包在实现时直接通过启动 exe 文件来完成，如 ping 这个npm包。</span></section></p>
+
+
+
+<figure class="wp-block-image size-full"><a href="/wp-content/uploads/2024/04/image-8.png"><img decoding="async" width="997" height="818" src="/wp-content/uploads/2024/04/image-8.png" alt="" class="wp-image-695" srcset="/wp-content/uploads/2024/04/image-8.png 997w, /wp-content/uploads/2024/04/image-8-300x246.png 300w, /wp-content/uploads/2024/04/image-8-768x630.png 768w" sizes="(max-width: 997px) 100vw, 997px"></a></figure>
+
+
+
+<p><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">让我们来看看源码，它是通过 child_process.spawn 启动 ping.exe 来实现的。</span></section></p>
+
+
+
+<figure class="wp-block-image size-full"><a href="/wp-content/uploads/2024/04/image-9.png"><img loading="lazy" decoding="async" width="745" height="571" src="/wp-content/uploads/2024/04/image-9.png" alt="" class="wp-image-696" srcset="/wp-content/uploads/2024/04/image-9.png 745w, /wp-content/uploads/2024/04/image-9-300x230.png 300w" sizes="auto, (max-width: 745px) 100vw, 745px"></a></figure>
+
+
+
+<p><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px"></span></section></p>
+
+
+
+<figure class="wp-block-image size-full"><a href="/wp-content/uploads/2024/04/image-10.png"><img loading="lazy" decoding="async" width="686" height="426" src="/wp-content/uploads/2024/04/image-10.png" alt="" class="wp-image-697" srcset="/wp-content/uploads/2024/04/image-10.png 686w, /wp-content/uploads/2024/04/image-10-300x186.png 300w" sizes="auto, (max-width: 686px) 100vw, 686px"></a></figure>
+
+
+
+<p><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">问题来了，Node.js 的 child_process.spawn 是在哪个线程调用 KERNEL32!CreateProcess 的呢？</span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">我们设了<span style="font-size: 15px;letter-spacing: 1px">CreateProcess 的</span>断点，当断点被触发后，查看 0 号线程（也就是主线程），我们发现 Node.js 是在主线程执行的 CreateProcess。</span></section></p>
+
+
+
+<figure class="wp-block-image size-large"><a href="/wp-content/uploads/2024/04/image-11.png"><img loading="lazy" decoding="async" width="1024" height="1005" src="/wp-content/uploads/2024/04/image-11-1024x1005.png" alt="" class="wp-image-698" srcset="/wp-content/uploads/2024/04/image-11-1024x1005.png 1024w, /wp-content/uploads/2024/04/image-11-300x294.png 300w, /wp-content/uploads/2024/04/image-11-768x754.png 768w, /wp-content/uploads/2024/04/image-11.png 1032w" sizes="auto, (max-width: 1024px) 100vw, 1024px"></a></figure>
+
+
+
+<p><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">CreateProcess 是一个相当耗费性能的 API，而且是安全软件的重点监控 API。若被安全软件拦截，或安全软件检查时间过长，就会造成这个 API 执行时间过长，进而导致主界面卡顿。从这个角度来看，Node.js 对 child_process 的实现方式在 Windows 桌面端场景上存在问题，而在 npm 生态中，许多 npm 包对此方法的调用，进一步放大了这个问题。</span></section><section style="line-height: 1.75em"><strong><span style="font-size: 15px;letter-spacing: 1px">三、总结</span></strong></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">Electron 通过 Node.js + Chromium ，为前端开发者开启了桌面程序开发的大门。这带来了开发效率的显著提升，但同时也引进了问题和挑战。</span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">首先，我们需要承认 Node.js 和 npm 生态并非完全适应 Windows 桌面开发。Node.js 的设计初衷并不以桌面开发为主，而 npm 生态也存在类似的情况。Node.js，这个以异步编程著称的框架，实际上有一些操作在主线程运行。一旦主线程出现阻塞，就可能导致桌面界面的卡顿或无响应。很多 npm 包的实现方法，如通过执行exe来实现功能，也存在相同的问题。</span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">其次，前端开发者往往没有桌面开发的背景，对于一些概念，如 pdb 或运行时库，并不熟悉。因此，即使他们通过导入 npm 包实现了功能，在自己的机器上运行正常，一旦发布，往往会出现兼容性问题。</span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">通过分享文中的经验，希望能帮助到更多的 Electron 开发者，避免踩坑。</span></section></p>
+
+
+
+<figure class="wp-block-image size-large"><a href="/wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676-1.jpg"><img loading="lazy" decoding="async" width="987" height="1024" src="/wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676-1-987x1024.jpg" alt="" class="wp-image-699" srcset="/wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676-1-987x1024.jpg 987w, /wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676-1-289x300.jpg 289w, /wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676-1-768x797.jpg 768w, /wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676-1.jpg 1122w" sizes="auto, (max-width: 987px) 100vw, 987px"></a></figure>
+
+
+
+<p></p>
+			</div><!-- .entry-content -->
+
+	<footer class="entry-meta">
+		This entry was posted in <a href="/category/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="category tag">学习笔记</a> by <a href="/author/admin/">mtian</a>. Bookmark the <a href="/2024/04/electron-npm-bug/" title="Permalink to electron 应用接入 npm 包的 4 个坑" rel="bookmark">permalink</a>.		
+		
+	</footer><!-- .entry-meta -->
+</article><!-- #post-692 -->
+
+	<div id="comments">
+	
+	
+			<h2 id="comments-title">
+			One Reply to “electron 应用接入 npm 包的 4 个坑”		</h2>
+
+		
+		<ol class="commentlist">
+				<li class="comment even thread-even depth-1" id="li-comment-25353">
+		<article id="comment-25353" class="comment">
+			<footer class="comment-meta">
+				<div class="comment-author vcard">
+					<img alt="" src="https://secure.gravatar.com/avatar/6e1c7fc96761691b5b685fb22ee1191299b92668860489a0282ce58537780a42?s=68&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/6e1c7fc96761691b5b685fb22ee1191299b92668860489a0282ce58537780a42?s=136&amp;d=mm&amp;r=g 2x" class="avatar avatar-68 photo" height="68" width="68" loading="lazy" decoding="async"><span class="fn"><a href="http://%E6%97%A0/" class="url" rel="ugc external nofollow">yang</a></span> on <a href="/2024/04/electron-npm-bug/#comment-25353"><time pubdate datetime="2024-11-07T11:45:32+08:00">2024-11-07 at 11:45</time></a> <span class="says">said:</span>
+									</div><!-- .comment-author .vcard -->
+
+				
+			</footer>
+
+			<div class="comment-content"><p>不错</p>
+</div>
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="/2024/04/electron-npm-bug/?replytocom=25353#respond" data-commentid="25353" data-postid="692" data-belowelement="comment-25353" data-respondelement="respond" data-replyto="回复给 yang" aria-label="回复给 yang">Reply <span>↓</span></a>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+		</ol>
+
+		
+	
+		<div id="respond" class="comment-respond">
+		<h2 id="reply-title" class="comment-reply-title">发表回复 <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2024/04/electron-npm-bug/#respond" style="display:none;">取消回复</a></small></h2><form action="/wp-comments-post.php" method="post" id="commentform" class="comment-form"><p class="comment-notes"><span id="email-notes">您的邮箱地址不会被公开。</span> <span class="required-field-message">必填项已用 <span class="required">*</span> 标注</span></p><p class="comment-form-comment"><label for="comment">评论 <span class="required">*</span></label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required></textarea></p><p class="comment-form-author"><label for="author">Name</label> <span class="required">*</span><input id="author" name="author" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-email"><label for="email">Email</label> <span class="required">*</span><input id="email" name="email" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-url"><label for="url">网站</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200" autocomplete="url"></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="发表评论"> <input type="hidden" name="comment_post_ID" value="692" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="b51e057467"></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>Δ<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="229"><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+</div><!-- #comments -->
+	<nav class="navigation post-navigation" aria-label="文章">
+		<h2 class="screen-reader-text">文章导航</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="/2024/04/prefetch-electron/" rel="prev"><span class="meta-nav" aria-hidden="true"><span class="nav-icon">←</span> Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">如何通过预读来加速 Electron 应用启动</span></a></div></div>
+	</nav>
+		</div><!-- #content -->
+        
+		            
+	</div><!-- #primary -->
+    
+	    
+
+
+		<aside id="secondary" class="sidebar widget-area" role="complementary">
+			<h2 class="screen-reader-text">Primary Sidebar Widget Area</h2>
+			<section id="categories-269971491" class="widget widget_categories"><h2 class="widget-title">分类</h2>
+			<ul>
+					<li class="cat-item cat-item-49"><a href="/category/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="/category/uncategorized/">未分类</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="/category/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/">胡思乱想</a>
+</li>
+			</ul>
+
+			</section>
+		<section id="recent-posts-2" class="widget widget_recent_entries">
+		<h2 class="widget-title">近期文章</h2>
+		<ul>
+											<li>
+					<a href="/2024/04/electron-npm-bug/" aria-current="page">electron 应用接入 npm 包的 4 个坑</a>
+									</li>
+											<li>
+					<a href="/2024/04/prefetch-electron/">如何通过预读来加速 Electron 应用启动</a>
+									</li>
+											<li>
+					<a href="/2019/02/varname/">为什么我还在用匈牙利命名法</a>
+									</li>
+											<li>
+					<a href="/2019/02/cstringandbugs/">C++的各种字符串和常见问题</a>
+									</li>
+											<li>
+					<a href="/2019/01/windows%E5%B9%B3%E5%8F%B0%E4%B8%8Bsqlite%E6%8E%A5%E5%8F%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">sqlite学习笔记（1）</a>
+									</li>
+					</ul>
+
+		</section><section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">近期评论</h2><ul id="recentcomments"><li class="recentcomments"><span class="comment-author-link">Gresces</span> 发表在《<a href="/2011/12/avpbase-dll/comment-page-1/#comment-26846">avpbase.dll的一些学习笔记</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href="http://%E6%97%A0/" class="url" rel="ugc external nofollow">yang</a></span> 发表在《<a href="/2024/04/electron-npm-bug/comment-page-1/#comment-25353">electron 应用接入 npm 包的 4 个坑</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href="https://xfxia.com/138736.html" class="url" rel="ugc external nofollow">对Windows 平台下PE文件数字签名的一些研究 – 小飞侠</a></span> 发表在《<a href="/2015/06/windowspesign/comment-page-1/#comment-25128">对Windows 平台下PE文件数字签名的一些研究</a>》</li><li class="recentcomments"><span class="comment-author-link">hjx</span> 发表在《<a href="/2015/06/windowspesign/comment-page-1/#comment-22651">对Windows 平台下PE文件数字签名的一些研究</a>》</li><li class="recentcomments"><span class="comment-author-link">XUQS</span> 发表在《<a href="/2019/02/varname/comment-page-1/#comment-22503">为什么我还在用匈牙利命名法</a>》</li></ul></section><section id="linkcat-2" class="widget widget_links"><h2 class="widget-title">链接</h2>
+	<ul class="xoxo blogroll">
+<li><a href="http://www.boxcounter.com/" title="Boxcounter的小黑屋" target="_blank">Boxcounter的小黑屋</a></li>
+<li><a href="http://www.xuetr.com/" rel="friend" target="_blank">linxer</a></li>
+
+	</ul>
+</section>
+<section id="meta-2" class="widget widget_meta"><h2 class="widget-title">其他操作</h2>
+		<ul>
+						<li><a href="/wp-login.php">登录</a></li>
+			<li><a href="/feed/">条目 feed</a></li>
+			<li><a href="/comments/feed/">评论 feed</a></li>
+
+			<li><a href="https://cn.wordpress.org/">WordPress.org</a></li>
+		</ul>
+
+		</section>		</aside><!-- #secondary .widget-area -->
+
+	</div><!-- #main -->
+
+	
+	<footer id="colophon" role="contentinfo">
+		
+        <div id="site-generator" class="clearfix">
+
+            
+			<nav class="social-profile" role="navigation" aria-label="Footer Social Links Menu">
+ 		 		<ul>
+				</ul>
+			</nav><!-- .social-profile --><div class="copyright">Copyright © 2026 <a href="/" title="麦田的小黑屋"><span>麦田的小黑屋</span></a>. All Rights Reserved. </div><div class="powered"><span class="theme-name">Theme: Catch Box by </span><span class="theme-author"><a href="https://catchthemes.com/" title="Catch Themes">Catch Themes</a></span></div>
+        </div> <!-- #site-generator -->
+
+	</footer><!-- #colophon -->
+
+</div><!-- #page -->
+
+<a href="#branding" id="scrollup"><span class="screen-reader-text">Scroll Up</span></a>
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/catch-box/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/javascript" src="/wp-content/plugins/wp-syntax/js/wp-syntax.js?ver=1.2" id="wp-syntax-js-js"></script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/skip-link-focus-fix.js?ver=20151112" id="catchbox-skip-link-focus-fix-js"></script>
+<script type="text/javascript" src="/wp-includes/js/comment-reply.min.js?ver=6.9.1" id="comment-reply-js" async="async" data-wp-strategy="async" fetchpriority="low"></script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/catchbox-scrollup.min.js?ver=20072014" id="catchbox-scrollup-js"></script>
+<script defer type="text/javascript" src="/wp-content/plugins/akismet/_inc/akismet-frontend.js?ver=1770655319" id="akismet-frontend-js"></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"/wp-includes/js/wp-emoji-release.min.js?ver=6.9.1"}}
+</script>
+<script type="module">
+/* <![CDATA[ */
+/*! This file is auto-generated */
+const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(window._wpemojiSettings=a,"wpEmojiSettingsSupports"),s=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const a=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===a[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,a){let r;const o=(r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),s=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(e=>{s[e]=t(o,e,n,a)}),s}function r(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}a.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),c.toString(),p.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"});const r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=e=>{i(n=e.data),r.terminate(),t(n)})}catch(e){}i(n=f(s,u,c,p))}t(n)}).then(e=>{for(const n in e)a.supports[n]=e[n],a.supports.everything=a.supports.everything&&a.supports[n],"flag"!==n&&(a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&a.supports[n]);var t;a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&!a.supports.flag,a.supports.everything||((t=a.source||{}).concatemoji?r(t.concatemoji):t.wpemoji&&t.twemoji&&(r(t.twemoji),r(t.wpemoji)))});
+//# sourceURL=/wp-includes/js/wp-emoji-loader.min.js
+/* ]]> */
+</script>
+
+</body>
+</html>

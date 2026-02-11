@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head><meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="profile" href="http://gmpg.org/xfn/11">
+    <link rel="pingback" href="/xmlrpc.php">
+    <title>如何通过预读来加速 Electron 应用启动 – 麦田的小黑屋</title>
+<meta name="robots" content="max-image-preview:large">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » Feed" href="/feed/">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » 评论 Feed" href="/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » 如何通过预读来加速 Electron 应用启动 评论 Feed" href="/2024/04/prefetch-electron/feed/">
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="/wp-json/oembed/1.0/embed?url=https%3A%2F%2F%2F2024%2F04%2Fprefetch-electron%2F">
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="/wp-json/oembed/1.0/embed?url=https%3A%2F%2F%2F2024%2F04%2Fprefetch-electron%2F&amp;format=xml">
+<style id="wp-img-auto-sizes-contain-inline-css" type="text/css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id="wp-emoji-styles-inline-css" type="text/css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<style id="wp-block-library-inline-css" type="text/css">
+:root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}.has-text-align-center{text-align:center}.has-text-align-left{text-align:left}.has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-wrap:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style*=border-top-color]){border-top-style:solid}html :where([style*=border-right-color]){border-right-style:solid}html :where([style*=border-bottom-color]){border-bottom-style:solid}html :where([style*=border-left-color]){border-left-style:solid}html :where([style*=border-width]){border-style:solid}html :where([style*=border-top-width]){border-top-style:solid}html :where([style*=border-right-width]){border-right-style:solid}html :where([style*=border-bottom-width]){border-bottom-style:solid}html :where([style*=border-left-width]){border-left-style:solid}html :where(img[class*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
+
+/*# sourceURL=wp-block-library-inline-css */
+</style>
+<style id="wp-block-image-inline-css" type="text/css">
+.wp-block-image>a,.wp-block-image>figure>a{display:inline-block}.wp-block-image img{box-sizing:border-box;height:auto;max-width:100%;vertical-align:bottom}@media not (prefers-reduced-motion){.wp-block-image img.hide{visibility:hidden}.wp-block-image img.show{animation:show-content-image .4s}}.wp-block-image[style*=border-radius] img,.wp-block-image[style*=border-radius]>a{border-radius:inherit}.wp-block-image.has-custom-border img{box-sizing:border-box}.wp-block-image.aligncenter{text-align:center}.wp-block-image.alignfull>a,.wp-block-image.alignwide>a{width:100%}.wp-block-image.alignfull img,.wp-block-image.alignwide img{height:auto;width:100%}.wp-block-image .aligncenter,.wp-block-image .alignleft,.wp-block-image .alignright,.wp-block-image.aligncenter,.wp-block-image.alignleft,.wp-block-image.alignright{display:table}.wp-block-image .aligncenter>figcaption,.wp-block-image .alignleft>figcaption,.wp-block-image .alignright>figcaption,.wp-block-image.aligncenter>figcaption,.wp-block-image.alignleft>figcaption,.wp-block-image.alignright>figcaption{caption-side:bottom;display:table-caption}.wp-block-image .alignleft{float:left;margin:.5em 1em .5em 0}.wp-block-image .alignright{float:right;margin:.5em 0 .5em 1em}.wp-block-image .aligncenter{margin-left:auto;margin-right:auto}.wp-block-image :where(figcaption){margin-bottom:1em;margin-top:.5em}.wp-block-image.is-style-circle-mask img{border-radius:9999px}@supports ((-webkit-mask-image:none) or (mask-image:none)) or (-webkit-mask-image:none){.wp-block-image.is-style-circle-mask img{border-radius:0;-webkit-mask-image:url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/>');mask-image:url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/>');mask-mode:alpha;-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:contain;mask-size:contain}}:root :where(.wp-block-image.is-style-rounded img,.wp-block-image .is-style-rounded img){border-radius:9999px}.wp-block-image figure{margin:0}.wp-lightbox-container{display:flex;flex-direction:column;position:relative}.wp-lightbox-container img{cursor:zoom-in}.wp-lightbox-container img:hover+button{opacity:1}.wp-lightbox-container button{align-items:center;backdrop-filter:blur(16px) saturate(180%);background-color:#5a5a5a40;border:none;border-radius:4px;cursor:zoom-in;display:flex;height:20px;justify-content:center;opacity:0;padding:0;position:absolute;right:16px;text-align:center;top:16px;width:20px;z-index:100}@media not (prefers-reduced-motion){.wp-lightbox-container button{transition:opacity .2s ease}}.wp-lightbox-container button:focus-visible{outline:3px auto #5a5a5a40;outline:3px auto -webkit-focus-ring-color;outline-offset:3px}.wp-lightbox-container button:hover{cursor:pointer;opacity:1}.wp-lightbox-container button:focus{opacity:1}.wp-lightbox-container button:focus,.wp-lightbox-container button:hover,.wp-lightbox-container button:not(:hover):not(:active):not(.has-background){background-color:#5a5a5a40;border:none}.wp-lightbox-overlay{box-sizing:border-box;cursor:zoom-out;height:100vh;left:0;overflow:hidden;position:fixed;top:0;visibility:hidden;width:100%;z-index:100000}.wp-lightbox-overlay .close-button{align-items:center;cursor:pointer;display:flex;justify-content:center;min-height:40px;min-width:40px;padding:0;position:absolute;right:calc(env(safe-area-inset-right) + 16px);top:calc(env(safe-area-inset-top) + 16px);z-index:5000000}.wp-lightbox-overlay .close-button:focus,.wp-lightbox-overlay .close-button:hover,.wp-lightbox-overlay .close-button:not(:hover):not(:active):not(.has-background){background:none;border:none}.wp-lightbox-overlay .lightbox-image-container{height:var(--wp--lightbox-container-height);left:50%;overflow:hidden;position:absolute;top:50%;transform:translate(-50%,-50%);transform-origin:top left;width:var(--wp--lightbox-container-width);z-index:9999999999}.wp-lightbox-overlay .wp-block-image{align-items:center;box-sizing:border-box;display:flex;height:100%;justify-content:center;margin:0;position:relative;transform-origin:0 0;width:100%;z-index:3000000}.wp-lightbox-overlay .wp-block-image img{height:var(--wp--lightbox-image-height);min-height:var(--wp--lightbox-image-height);min-width:var(--wp--lightbox-image-width);width:var(--wp--lightbox-image-width)}.wp-lightbox-overlay .wp-block-image figcaption{display:none}.wp-lightbox-overlay button{background:none;border:none}.wp-lightbox-overlay .scrim{background-color:#fff;height:100%;opacity:.9;position:absolute;width:100%;z-index:2000000}.wp-lightbox-overlay.active{visibility:visible}@media not (prefers-reduced-motion){.wp-lightbox-overlay.active{animation:turn-on-visibility .25s both}.wp-lightbox-overlay.active img{animation:turn-on-visibility .35s both}.wp-lightbox-overlay.show-closing-animation:not(.active){animation:turn-off-visibility .35s both}.wp-lightbox-overlay.show-closing-animation:not(.active) img{animation:turn-off-visibility .25s both}.wp-lightbox-overlay.zoom.active{animation:none;opacity:1;visibility:visible}.wp-lightbox-overlay.zoom.active .lightbox-image-container{animation:lightbox-zoom-in .4s}.wp-lightbox-overlay.zoom.active .lightbox-image-container img{animation:none}.wp-lightbox-overlay.zoom.active .scrim{animation:turn-on-visibility .4s forwards}.wp-lightbox-overlay.zoom.show-closing-animation:not(.active){animation:none}.wp-lightbox-overlay.zoom.show-closing-animation:not(.active) .lightbox-image-container{animation:lightbox-zoom-out .4s}.wp-lightbox-overlay.zoom.show-closing-animation:not(.active) .lightbox-image-container img{animation:none}.wp-lightbox-overlay.zoom.show-closing-animation:not(.active) .scrim{animation:turn-off-visibility .4s forwards}}@keyframes show-content-image{0%{visibility:hidden}99%{visibility:hidden}to{visibility:visible}}@keyframes turn-on-visibility{0%{opacity:0}to{opacity:1}}@keyframes turn-off-visibility{0%{opacity:1;visibility:visible}99%{opacity:0;visibility:visible}to{opacity:0;visibility:hidden}}@keyframes lightbox-zoom-in{0%{transform:translate(calc((-100vw + var(--wp--lightbox-scrollbar-width))/2 + var(--wp--lightbox-initial-left-position)),calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale))}to{transform:translate(-50%,-50%) scale(1)}}@keyframes lightbox-zoom-out{0%{transform:translate(-50%,-50%) scale(1);visibility:visible}99%{visibility:visible}to{transform:translate(calc((-100vw + var(--wp--lightbox-scrollbar-width))/2 + var(--wp--lightbox-initial-left-position)),calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));visibility:hidden}}
+/*# sourceURL=/wp-includes/blocks/image/style.min.css */
+</style>
+<style id="wp-block-image-theme-inline-css" type="text/css">
+:root :where(.wp-block-image figcaption){color:#555;font-size:13px;text-align:center}.is-dark-theme :root :where(.wp-block-image figcaption){color:#ffffffa6}.wp-block-image{margin:0 0 1em}
+/*# sourceURL=/wp-includes/blocks/image/theme.min.css */
+</style>
+<style id="wp-block-code-inline-css" type="text/css">
+.wp-block-code{box-sizing:border-box}.wp-block-code code{
+  /*!rtl:begin:ignore*/direction:ltr;display:block;font-family:inherit;overflow-wrap:break-word;text-align:initial;white-space:pre-wrap
+  /*!rtl:end:ignore*/}
+/*# sourceURL=/wp-includes/blocks/code/style.min.css */
+</style>
+<style id="wp-block-code-theme-inline-css" type="text/css">
+.wp-block-code{border:1px solid #ccc;border-radius:4px;font-family:Menlo,Consolas,monaco,monospace;padding:.8em 1em}
+/*# sourceURL=/wp-includes/blocks/code/theme.min.css */
+</style>
+<style id="wp-block-paragraph-inline-css" type="text/css">
+.is-small-text{font-size:.875em}.is-regular-text{font-size:1em}.is-large-text{font-size:2.25em}.is-larger-text{font-size:3em}.has-drop-cap:not(:focus):first-letter{float:left;font-size:8.4em;font-style:normal;font-weight:100;line-height:.68;margin:.05em .1em 0 0;text-transform:uppercase}body.rtl .has-drop-cap:not(:focus):first-letter{float:none;margin-left:.1em}p.has-drop-cap.has-background{overflow:hidden}:root :where(p.has-background){padding:1.25em 2.375em}:where(p.has-text-color:not(.has-link-color)) a{color:inherit}p.has-text-align-left[style*="writing-mode:vertical-lr"],p.has-text-align-right[style*="writing-mode:vertical-rl"]{rotate:180deg}
+/*# sourceURL=/wp-includes/blocks/paragraph/style.min.css */
+</style>
+
+<style id="classic-theme-styles-inline-css" type="text/css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+<style id="global-styles-inline-css" type="text/css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--dark-gray: #373737;--wp--preset--color--medium-gray: #cccccc;--wp--preset--color--light-gray: #eeeeee;--wp--preset--color--blue: #1982d1;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 14px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 24px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-size--normal: 16px;--wp--preset--font-size--huge: 26px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link rel="stylesheet" id="wp-syntax-css-css" href="/wp-content/plugins/wp-syntax/css/wp-syntax.css?ver=1.2" type="text/css" media="all">
+<link rel="stylesheet" id="genericons-css" href="/wp-content/themes/catch-box/genericons/genericons.css?ver=3.4.1" type="text/css" media="all">
+<link rel="stylesheet" id="catchbox-style-css" href="/wp-content/themes/catch-box/style.css?ver=20260211-144644" type="text/css" media="all">
+<link rel="stylesheet" id="catchbox-block-style-css" href="/wp-content/themes/catch-box/css/blocks.css?ver=1.0" type="text/css" media="all">
+<script type="text/javascript" src="/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script type="text/javascript" id="catchbox-menu-js-extra">
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+//# sourceURL=catchbox-menu-js-extra
+/* ]]> */
+</script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/menu.min.js?ver=2.1.1.1" id="catchbox-menu-js"></script>
+<link rel="https://api.w.org/" href="/wp-json/"><link rel="alternate" title="JSON" type="application/json" href="/wp-json/wp/v2/posts/682"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="/xmlrpc.php?rsd">
+<meta name="generator" content="WordPress 6.9.1">
+<link rel="canonical" href="/2024/04/prefetch-electron/">
+<link rel="shortlink" href="/?p=682">
+<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style></head>
+
+<body class="wp-singular post-template-default single single-post postid-682 single-format-standard wp-embed-responsive wp-theme-catch-box single-author right-sidebar one-menu header-image-top">
+
+    
+    
+    <div id="page" class="hfeed site">
+
+        <a href="#main" class="skip-link screen-reader-text">Skip to content</a>
+        <header id="branding" role="banner">
+
+            
+            <div id="header-content" class="clearfix">
+
+                <div class="logo-wrap clearfix">	<div id="hgroup" class="site-details">
+					<p id="site-title"><a href="/" rel="home">麦田的小黑屋</a></p>
+			
+   	</div><!-- #hgroup -->
+</div><!-- .logo-wrap -->	<form role="search" method="get" class="searchform" action="/">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input type="search" class="search-field" placeholder="Search" value="" name="s" title="Search for:">
+		</label>
+		<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+	</form>
+
+            </div><!-- #header-content -->
+
+                <div class="menu-access-wrap mobile-header-menu clearfix">
+        <div id="mobile-header-left-menu" class="mobile-menu-anchor page-menu">
+            <a href="#mobile-header-left-nav" id="menu-toggle-primary" class="genericon genericon-menu">
+                <span class="mobile-menu-text">Menu</span>
+            </a>
+        </div><!-- #mobile-header-left-menu -->
+            
+        
+        <div id="site-header-menu-primary" class="site-header-menu">
+            <nav id="access" class="main-navigation menu-focus" role="navigation" aria-label="Primary Menu">
+            
+                <h3 class="screen-reader-text">Primary menu</h3>
+                <div class="menu-header-container"><ul class="menu"><li><a href="/">首页</a></li><li class="page_item page-item-2"><a href="/about/">关于</a></li></ul></div><!-- .menu-header-container -->            </nav><!-- #access -->
+        </div><!-- .site-header-menu -->
+
+            </div><!-- .menu-access-wrap -->
+    
+        </header><!-- #branding -->
+
+        
+        
+        <div id="main" class="clearfix">
+
+            
+            <div id="primary" class="content-area">
+
+                
+                <div id="content" role="main">
+                    
+				
+<article id="post-682" class="post-682 post type-post status-publish format-standard hentry category-49">
+	<header class="entry-header">
+		<h1 class="entry-title">如何通过预读来加速 Electron 应用启动</h1>
+
+		            <div class="entry-meta">
+                <span class="sep">Posted on </span><a href="/2024/04/prefetch-electron/" title="21:49" rel="bookmark"><time class="entry-date updated" datetime="2024-04-29T21:49:34+08:00" pubdate>2024-04-29</time></a><span class="by-author"> <span class="sep"> by </span> <span class="author vcard"><a class="url fn n" href="/author/admin/" title="View all posts by mtian" rel="author">mtian</a></span></span>                                    <span class="sep sep-comment"> — </span>
+                    <span class="comments-link">
+                        <a href="/2024/04/prefetch-electron/#respond">No Comments ↓</a>                    </span>
+                            </div><!-- .entry-meta -->
+			</header><!-- .entry-header -->
+
+	<div class="entry-content">
+		<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #1677ff; margin: 0 0 25px 0; font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;">
+  <p style="margin: 0 0 10px 0; font-size: 16px; color: #333; line-height: 1.6;">
+    后续更新迁移至个人微信公众号：
+  </p>
+  <div style="margin: 10px 0; text-align: center;">
+    <img decoding="async" src="/wp-content/uploads/2026/02/8040ce2f10694766ab96b8b431fd68a9.jpg" alt="微信公众号二维码" style="width: 150px; height: 150px; border: none;">
+  </div>
+  <p style="margin: 10px 0; font-size: 16px; color: #333; line-height: 1.6;">
+    亦有邮箱可供联系：<a href="mailto:274048862@qq.com" style="color: #1677ff; text-decoration: none;">274048862@qq.com</a>
+  </p>
+  <p style="margin: 10px 0 0 0; font-size: 16px; color: #333; line-height: 1.6;">
+    感谢一路支持
+  </p>
+</div>
+<p></p><p style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">启动速度对软件用户体验的影响是显而易见的，实验也表明，启动速度可影响用户对软件的使用时长。</span></p><p style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">就性能优化策略而言，预读（Prefetching）在提升应用程序启动速度方面有显著的作用。预读是如何运作的？为什么它可以加速应用的启动？如何适当地利用预读技术来优化我们的应用程序？</span></p><p style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">在本文中，我们将深入研究这些问题，详细介绍预读技术，并解释其如何提升启动速度。</span></p><p style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px"><strong>1、缺页对启动速度的影响</strong></span></p><p style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">在进程启动时，操作系统并不会将 PE 文件的所有内容全部加载到物理内存当中。而是等程序开始执行代码后，才会去加载该代码所在的文件内容。然而，如果这时相关代码所在的地址还没有被加载到内存中，系统就会引发一次缺页（Page Fault）错误。</span></p><p style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">这将导致系统必须去执行一个IO操作，将对应的代码从磁盘中读出加载到内存中，然后才能继续执行代码。如下图，在 Cpu Usage 视图可以看到 electron-demo.exe 在执行过程中触发了缺页错误，在107us后才恢复执行。在 “Hard Faults” 视图，可以看到此时发生了一个缺页事件，对应的文件名是 electron-demo.exe，该事件耗时118us。在”Disk Usage”视图中，我们代码执行前产生了一个IO 操作，耗时109us。</span></p><p style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">关于这几个时间为何不完全一致，我猜测可能是 ETW 事件的统计问题。但这并不妨碍我们看到 IO 事件完成后，CPU 才继续执行的事实。</span></p>
+
+
+
+<figure class="wp-block-image size-large"><a href="/wp-content/uploads/2024/04/image.png"><img fetchpriority="high" decoding="async" width="1024" height="518" src="/wp-content/uploads/2024/04/image-1024x518.png" alt="" class="wp-image-683" srcset="/wp-content/uploads/2024/04/image-1024x518.png 1024w, /wp-content/uploads/2024/04/image-300x152.png 300w, /wp-content/uploads/2024/04/image-768x388.png 768w, /wp-content/uploads/2024/04/image.png 1080w" sizes="(max-width: 1024px) 100vw, 1024px"></a></figure>
+
+
+
+<p><section style="text-align: center;line-height: 1.75em"><img data-galleryid="" data-imgfileid="100000271" data-ratio="0.5055555555555555" data-s="300,640" data-src="https://mmbiz.qpic.cn/sz_mmbiz_png/0zaPvwdBF0UKfddQ1tdPBicWL2KFhsS2G4Lw9ItGeSekHTxOuxb9UGOv1quVS9KgaCXmIFibdGleCnwHU7L4Dcng/640?wx_fmt=png&amp;from=appmsg" data-type="png" data-w="1080" class="rich_pages wxw-img"></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">虽然从单个缺页事件来看，它的处理耗时可能并不长，但如</span>果<span style="font-size: 15px;letter-spacing: 1px">发生大量的缺页错误呢？</span><span style="font-size: 15px;letter-spacing: 1px">我</span>框<span style="font-size: 15px;letter-spacing: 1px">选了一段启动过程（总长549ms），在这段时间产生的缺页事件总和达到了约150ms。</span><span style="font-size: 15px;letter-spacing: 1px">虽然不是所有的150ms都会直接阻塞启动过程，但我们可以看出，缺</span>页<span style="font-size: 15px;letter-spacing: 1px">对启动速度确实有着不容忽视的影响。</span></section></p>
+
+
+
+<figure class="wp-block-image size-large"><a href="/wp-content/uploads/2024/04/image-1.png"><img decoding="async" width="1024" height="331" src="/wp-content/uploads/2024/04/image-1-1024x331.png" alt="" class="wp-image-684" srcset="/wp-content/uploads/2024/04/image-1-1024x331.png 1024w, /wp-content/uploads/2024/04/image-1-300x97.png 300w, /wp-content/uploads/2024/04/image-1-768x248.png 768w, /wp-content/uploads/2024/04/image-1.png 1080w" sizes="(max-width: 1024px) 100vw, 1024px"></a></figure>
+
+
+
+<p><section style="text-align: center;line-height: 1.75em"><img data-galleryid="" data-imgfileid="100000272" data-ratio="0.32314814814814813" data-s="300,640" data-src="https://mmbiz.qpic.cn/sz_mmbiz_png/0zaPvwdBF0UKfddQ1tdPBicWL2KFhsS2G6nzhBicOyyvAy5IOZ20C8LliaWgSoUf6UW4lkibTHF0aDUppgflMhvWLQ/640?wx_fmt=png&amp;from=appmsg" data-type="png" data-w="1080" class="rich_pages wxw-img"><span style="font-size: var(--articleFontsize);letter-spacing: 0.034em;text-align: justify"></span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px"><strong>2、预读如何解决这个问题？</strong></span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">明白了系统并没有将所有代码一次性加载到物理内存后，一个可行的解决方案是尽早地让系统将全部代码加载进去，这种策略称为预读。</span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">你可能会有疑问，预读的 IO 是否会消耗和缺页错误同样多的时间？是否只是将同样的耗时提前？针对这一问题，我们可以从观察缺页事件中得到的两个特点来解答：</span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">a. 缺页事件通常比较零碎。比如，在这些事件中，读取32K（32768）大小的数据耗时大约是0.12ms，而读取4K（4096）大小的数据耗时也大约是0.12ms。也就是说，尽管数据大小为4倍，但并未消耗4倍的时间。显然，进行大块数据的 IO 操作更为划算。</span></section></p>
+
+
+
+<figure class="wp-block-image size-large"><a href="/wp-content/uploads/2024/04/image-2.png"><img decoding="async" width="1024" height="332" src="/wp-content/uploads/2024/04/image-2-1024x332.png" alt="" class="wp-image-685" srcset="/wp-content/uploads/2024/04/image-2-1024x332.png 1024w, /wp-content/uploads/2024/04/image-2-300x97.png 300w, /wp-content/uploads/2024/04/image-2-768x249.png 768w, /wp-content/uploads/2024/04/image-2.png 1080w" sizes="(max-width: 1024px) 100vw, 1024px"></a></figure>
+
+
+
+<figure class="wp-block-image size-large"><a href="/wp-content/uploads/2024/04/image-3.png"><img loading="lazy" decoding="async" width="1024" height="406" src="/wp-content/uploads/2024/04/image-3-1024x406.png" alt="" class="wp-image-686" srcset="/wp-content/uploads/2024/04/image-3-1024x406.png 1024w, /wp-content/uploads/2024/04/image-3-300x119.png 300w, /wp-content/uploads/2024/04/image-3-768x304.png 768w, /wp-content/uploads/2024/04/image-3.png 1080w" sizes="auto, (max-width: 1024px) 100vw, 1024px"></a></figure>
+
+
+
+<p><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">b. 如果我们按时间排序缺页事件，会发现文件偏移（File Offset）经常忽前忽后地跳跃，也就是非顺序读取。这种读取方式会引发磁盘寻址。虽然在 SSD 磁盘上寻址时间可以忽略不计，但在机械硬盘上却可能会导致较长的耗时。</span></section></p>
+
+
+
+<figure class="wp-block-image size-full"><a href="/wp-content/uploads/2024/04/image-4.png"><img loading="lazy" decoding="async" width="921" height="698" src="/wp-content/uploads/2024/04/image-4.png" alt="" class="wp-image-687" srcset="/wp-content/uploads/2024/04/image-4.png 921w, /wp-content/uploads/2024/04/image-4-300x227.png 300w, /wp-content/uploads/2024/04/image-4-768x582.png 768w" sizes="auto, (max-width: 921px) 100vw, 921px"></a></figure>
+
+
+
+<p><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">基于以上两个角度，我们如果能实现顺序的大块 IO 预读，就能成功缩短整体的 IO 时间。</span></section></p>
+
+
+
+<p><section style="line-height: 1.75em"><strong><span style="font-size: 15px;letter-spacing: 1px">3、业界怎么做预读？</span></strong></section></p>
+
+
+
+<p><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px"></span><span style="font-size: 15px;letter-spacing: 1px">chromium 中就有预读的代码，主要代码如下，main_dll_loader_win.cc 的 LoadModuleWithDirectory 会在加载 dll 之前调用 PreReadFile 进行预读。</span></section></p>
+
+
+
+<pre class="wp-block-code"><code>MainDllLoader::LoadResult MainDllLoader::LoadModuleWithDirectory(
+const base::FilePath&amp; module) {
+  ::SetCurrentDirectoryW(module.DirName().value().c_str());
+  base::PrefetchResultCode prefetch_result_code =
+      base::PreReadFile(module, /*is_executable=*/true).code_;
+  HMODULE handle = ::LoadLibraryExW(module.value().c_str(), nullptr,
+                                    LOAD_WITH_ALTERED_SEARCH_PATH);
+return {handle, prefetch_result_code};
+}</code></pre>
+
+
+
+<p>file_util_win.cc 中的 PreReadFile 会调用 PrefetchVirtualMemory 来预读了整个文件，需要注意的是 PrefetchVirtualMemory 在 win8 以后的系统上才有，在 win7 上 chromium 是直接调用的 ReadFile。</p>
+
+
+
+<pre class="wp-block-code"><code>PrefetchResult PreReadFile(const FilePath&amp; file_path,
+                           bool is_executable,
+                           int64_t max_bytes) {
+  DCHECK_GE(max_bytes, 0);
+// On Win8 and higher use ::PrefetchVirtualMemory(). This is better  than a
+// simple data file read, more from a RAM perspective than CPU. This  is
+// because reading the file as data results in double mapping to
+// Image/executable pages for all pages of code executed.
+static PrefetchVirtualMemoryPtr prefetch_virtual_memory =
+      GetPrefetchVirtualMemoryPtr();
+if (prefetch_virtual_memory == nullptr)
+return internal::PreReadFileSlow(file_path, max_bytes)
+               ? PrefetchResult{PrefetchResultCode::kSlowSuccess}
+               : PrefetchResult{PrefetchResultCode::kSlowFailed};
+if (max_bytes == 0) {
+// PrefetchVirtualMemory() fails when asked to read zero bytes.
+// base::MemoryMappedFile::Initialize() fails on an empty file.
+return PrefetchResult{PrefetchResultCode::kSuccess};
+  }
+// PrefetchVirtualMemory() fails if the file is opened with write  access.
+  MemoryMappedFile::Access access = is_executable
+                                        ? MemoryMappedFile::READ_CODE_IMAGE
+                                        : MemoryMappedFile::READ_ONLY;
+  MemoryMappedFile mapped_file;
+if (!mapped_file.Initialize(file_path, access)) {
+return internal::PreReadFileSlow(file_path, max_bytes)
+               ?  PrefetchResult{PrefetchResultCode::kMemoryMapFailedSlowUsed}
+               :  PrefetchResult{PrefetchResultCode::kMemoryMapFailedSlowFailed};
+  }
+const ::SIZE_T length =
+      std::min(base::saturated_cast&lt;::SIZE_T&gt;(max_bytes),
+               base::saturated_cast&lt;::SIZE_T&gt;(mapped_file.length()));
+  ::_WIN32_MEMORY_RANGE_ENTRY address_range = {mapped_file.data(),  length};
+if (!prefetch_virtual_memory(::GetCurrentProcess(),
+/*NumberOfEntries=*/1, &amp;address_range,
+/*Flags=*/0)) {
+return internal::PreReadFileSlow(file_path, max_bytes)
+               ? PrefetchResult{PrefetchResultCode::kFastFailedSlowUsed}
+               : PrefetchResult{PrefetchResultCode::kFastFailedSlowFailed};
+  }
+return PrefetchResult{PrefetchResultCode::kSuccess};
+}</code></pre>
+
+
+
+<p><strong>4、chromium 的预读是否有改进的空间？</strong></p>
+
+
+
+<p>a、精细化预读：虽然 chromium 对自己的 DLL 文件进行了预读，但对于 electron 应用来说，可能并不需要所有的功能，因此某些代码根本不会被执行。那么，这些代码所在位置真的需要进行预加载么？如果我们通过捕获 ETW 缺页事件，确定何处会引发缺页，然后根据收集的数据做出精细化的预读，是否能缩短预读的时间呢？</p>
+
+
+
+<p>b、预读更多的文件。chrome 只对部分文件做了预读，但是从实际使用上来看，还有一些其他的文件会产生缺页，我们也可以进行预读。</p>
+
+
+
+<figure class="wp-block-image size-full"><a href="/wp-content/uploads/2024/04/image-5.png"><img loading="lazy" decoding="async" width="836" height="375" src="/wp-content/uploads/2024/04/image-5.png" alt="" class="wp-image-688" srcset="/wp-content/uploads/2024/04/image-5.png 836w, /wp-content/uploads/2024/04/image-5-300x135.png 300w, /wp-content/uploads/2024/04/image-5-768x344.png 768w" sizes="auto, (max-width: 836px) 100vw, 836px"></a></figure>
+
+
+
+<p><section style="line-height: 1.75em"><strong style="font-size: 15px;letter-spacing: 1px">5、electron 怎么做预读？</strong></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">很不幸，以 electron 目前的构架，不好做预读，electron 自身就是一个大的 exe，如果等到 main 入口后再对自己进行预读，已经有些晚了。要做预读的话，可能需要借助其他的 exe 文件，像是 launcher。这又引入了新的问题，增加 launcher 会增加启动的耗时。更好的方法可能是将 electron 拆分为一个小 exe 和一个大 DLL ，然后在小 exe 中预读大 DLL 文件。事实上，这正是 chrome 的实现方式。从这个角度看，electron 在集成 Chromium 时没学到位。</span></section></p>
+
+
+
+<p><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px"><strong>6、总结</strong></span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">在这篇文章中，我们探讨了如何利用预读技术优化 electron 应用的启动速度。首先理解了缺页对启动速度的影响，并了解<span style="font-size: 15px;letter-spacing: 1px">Chromium 的预读</span><span style="font-size: 15px;letter-spacing: 1px">代码</span>。接着，我们发现了 Chromium 的预读实现还有一些改进的空间，并针对 electron 的情况，提出了一些可能的优化建议。</span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">预读的目标是在代码执行之前，提前加载所需的数据，从而避免造成性能问题的缺页事件。对 electron 来说，受现有架构的影响，实施预读并非易事。</span></section><section style="line-height: 1.75em"><span style="font-size: 15px;letter-spacing: 1px">在未来，希望 electron 官方可以借鉴并改进 chromium 的预读，更好地优化其启动性能。</span></section></p>
+
+
+
+<figure class="wp-block-image size-large"><a href="/wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676.jpg"><img loading="lazy" decoding="async" width="987" height="1024" src="/wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676-987x1024.jpg" alt="" class="wp-image-690" srcset="/wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676-987x1024.jpg 987w, /wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676-289x300.jpg 289w, /wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676-768x797.jpg 768w, /wp-content/uploads/2024/04/2bb46a740b2e128984447d60219b676.jpg 1122w" sizes="auto, (max-width: 987px) 100vw, 987px"></a></figure>
+
+
+
+<p><section style="line-height: 1.75em"></section></p>
+			</div><!-- .entry-content -->
+
+	<footer class="entry-meta">
+		This entry was posted in <a href="/category/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="category tag">学习笔记</a> by <a href="/author/admin/">mtian</a>. Bookmark the <a href="/2024/04/prefetch-electron/" title="Permalink to 如何通过预读来加速 Electron 应用启动" rel="bookmark">permalink</a>.		
+		
+	</footer><!-- .entry-meta -->
+</article><!-- #post-682 -->
+
+	<div id="comments">
+	
+	
+	
+		<div id="respond" class="comment-respond">
+		<h2 id="reply-title" class="comment-reply-title">发表回复 <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2024/04/prefetch-electron/#respond" style="display:none;">取消回复</a></small></h2><form action="/wp-comments-post.php" method="post" id="commentform" class="comment-form"><p class="comment-notes"><span id="email-notes">您的邮箱地址不会被公开。</span> <span class="required-field-message">必填项已用 <span class="required">*</span> 标注</span></p><p class="comment-form-comment"><label for="comment">评论 <span class="required">*</span></label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required></textarea></p><p class="comment-form-author"><label for="author">Name</label> <span class="required">*</span><input id="author" name="author" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-email"><label for="email">Email</label> <span class="required">*</span><input id="email" name="email" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-url"><label for="url">网站</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200" autocomplete="url"></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="发表评论"> <input type="hidden" name="comment_post_ID" value="682" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="8d992519f3"></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>Δ<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="65"><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+</div><!-- #comments -->
+	<nav class="navigation post-navigation" aria-label="文章">
+		<h2 class="screen-reader-text">文章导航</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="/2019/02/varname/" rel="prev"><span class="meta-nav" aria-hidden="true"><span class="nav-icon">←</span> Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">为什么我还在用匈牙利命名法</span></a></div><div class="nav-next"><a href="/2024/04/electron-npm-bug/" rel="next"><span class="meta-nav" aria-hidden="true">Next <span class="nav-icon">→</span></span> <span class="screen-reader-text">Next post:</span> <span class="post-title">electron 应用接入 npm 包的 4 个坑</span></a></div></div>
+	</nav>
+		</div><!-- #content -->
+        
+		            
+	</div><!-- #primary -->
+    
+	    
+
+
+		<aside id="secondary" class="sidebar widget-area" role="complementary">
+			<h2 class="screen-reader-text">Primary Sidebar Widget Area</h2>
+			<section id="categories-269971491" class="widget widget_categories"><h2 class="widget-title">分类</h2>
+			<ul>
+					<li class="cat-item cat-item-49"><a href="/category/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="/category/uncategorized/">未分类</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="/category/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/">胡思乱想</a>
+</li>
+			</ul>
+
+			</section>
+		<section id="recent-posts-2" class="widget widget_recent_entries">
+		<h2 class="widget-title">近期文章</h2>
+		<ul>
+											<li>
+					<a href="/2024/04/electron-npm-bug/">electron 应用接入 npm 包的 4 个坑</a>
+									</li>
+											<li>
+					<a href="/2024/04/prefetch-electron/" aria-current="page">如何通过预读来加速 Electron 应用启动</a>
+									</li>
+											<li>
+					<a href="/2019/02/varname/">为什么我还在用匈牙利命名法</a>
+									</li>
+											<li>
+					<a href="/2019/02/cstringandbugs/">C++的各种字符串和常见问题</a>
+									</li>
+											<li>
+					<a href="/2019/01/windows%E5%B9%B3%E5%8F%B0%E4%B8%8Bsqlite%E6%8E%A5%E5%8F%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">sqlite学习笔记（1）</a>
+									</li>
+					</ul>
+
+		</section><section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">近期评论</h2><ul id="recentcomments"><li class="recentcomments"><span class="comment-author-link">Gresces</span> 发表在《<a href="/2011/12/avpbase-dll/comment-page-1/#comment-26846">avpbase.dll的一些学习笔记</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href="http://%E6%97%A0/" class="url" rel="ugc external nofollow">yang</a></span> 发表在《<a href="/2024/04/electron-npm-bug/comment-page-1/#comment-25353">electron 应用接入 npm 包的 4 个坑</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href="https://xfxia.com/138736.html" class="url" rel="ugc external nofollow">对Windows 平台下PE文件数字签名的一些研究 – 小飞侠</a></span> 发表在《<a href="/2015/06/windowspesign/comment-page-1/#comment-25128">对Windows 平台下PE文件数字签名的一些研究</a>》</li><li class="recentcomments"><span class="comment-author-link">hjx</span> 发表在《<a href="/2015/06/windowspesign/comment-page-1/#comment-22651">对Windows 平台下PE文件数字签名的一些研究</a>》</li><li class="recentcomments"><span class="comment-author-link">XUQS</span> 发表在《<a href="/2019/02/varname/comment-page-1/#comment-22503">为什么我还在用匈牙利命名法</a>》</li></ul></section><section id="linkcat-2" class="widget widget_links"><h2 class="widget-title">链接</h2>
+	<ul class="xoxo blogroll">
+<li><a href="http://www.boxcounter.com/" title="Boxcounter的小黑屋" target="_blank">Boxcounter的小黑屋</a></li>
+<li><a href="http://www.xuetr.com/" rel="friend" target="_blank">linxer</a></li>
+
+	</ul>
+</section>
+<section id="meta-2" class="widget widget_meta"><h2 class="widget-title">其他操作</h2>
+		<ul>
+						<li><a href="/wp-login.php">登录</a></li>
+			<li><a href="/feed/">条目 feed</a></li>
+			<li><a href="/comments/feed/">评论 feed</a></li>
+
+			<li><a href="https://cn.wordpress.org/">WordPress.org</a></li>
+		</ul>
+
+		</section>		</aside><!-- #secondary .widget-area -->
+
+	</div><!-- #main -->
+
+	
+	<footer id="colophon" role="contentinfo">
+		
+        <div id="site-generator" class="clearfix">
+
+            
+			<nav class="social-profile" role="navigation" aria-label="Footer Social Links Menu">
+ 		 		<ul>
+				</ul>
+			</nav><!-- .social-profile --><div class="copyright">Copyright © 2026 <a href="/" title="麦田的小黑屋"><span>麦田的小黑屋</span></a>. All Rights Reserved. </div><div class="powered"><span class="theme-name">Theme: Catch Box by </span><span class="theme-author"><a href="https://catchthemes.com/" title="Catch Themes">Catch Themes</a></span></div>
+        </div> <!-- #site-generator -->
+
+	</footer><!-- #colophon -->
+
+</div><!-- #page -->
+
+<a href="#branding" id="scrollup"><span class="screen-reader-text">Scroll Up</span></a>
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/catch-box/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/javascript" src="/wp-content/plugins/wp-syntax/js/wp-syntax.js?ver=1.2" id="wp-syntax-js-js"></script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/skip-link-focus-fix.js?ver=20151112" id="catchbox-skip-link-focus-fix-js"></script>
+<script type="text/javascript" src="/wp-includes/js/comment-reply.min.js?ver=6.9.1" id="comment-reply-js" async="async" data-wp-strategy="async" fetchpriority="low"></script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/catchbox-scrollup.min.js?ver=20072014" id="catchbox-scrollup-js"></script>
+<script defer type="text/javascript" src="/wp-content/plugins/akismet/_inc/akismet-frontend.js?ver=1770655319" id="akismet-frontend-js"></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"/wp-includes/js/wp-emoji-release.min.js?ver=6.9.1"}}
+</script>
+<script type="module">
+/* <![CDATA[ */
+/*! This file is auto-generated */
+const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(window._wpemojiSettings=a,"wpEmojiSettingsSupports"),s=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const a=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===a[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,a){let r;const o=(r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),s=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(e=>{s[e]=t(o,e,n,a)}),s}function r(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}a.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),c.toString(),p.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"});const r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=e=>{i(n=e.data),r.terminate(),t(n)})}catch(e){}i(n=f(s,u,c,p))}t(n)}).then(e=>{for(const n in e)a.supports[n]=e[n],a.supports.everything=a.supports.everything&&a.supports[n],"flag"!==n&&(a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&a.supports[n]);var t;a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&!a.supports.flag,a.supports.everything||((t=a.source||{}).concatemoji?r(t.concatemoji):t.wpemoji&&t.twemoji&&(r(t.twemoji),r(t.wpemoji)))});
+//# sourceURL=/wp-includes/js/wp-emoji-loader.min.js
+/* ]]> */
+</script>
+
+</body>
+</html>

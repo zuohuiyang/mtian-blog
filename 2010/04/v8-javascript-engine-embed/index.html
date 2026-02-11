@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head><meta charset="UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="profile" href="http://gmpg.org/xfn/11">
+    <link rel="pingback" href="/xmlrpc.php">
+    <title>(译)V8 JavaScript 引擎 – 嵌入者指南 – 麦田的小黑屋</title>
+<meta name="robots" content="max-image-preview:large">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » Feed" href="/feed/">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » 评论 Feed" href="/comments/feed/">
+<link rel="alternate" type="application/rss+xml" title="麦田的小黑屋 » (译)V8 JavaScript 引擎 – 嵌入者指南 评论 Feed" href="/2010/04/v8-javascript-engine-embed/feed/">
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="/wp-json/oembed/1.0/embed?url=https%3A%2F%2F%2F2010%2F04%2Fv8-javascript-engine-embed%2F">
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="/wp-json/oembed/1.0/embed?url=https%3A%2F%2F%2F2010%2F04%2Fv8-javascript-engine-embed%2F&amp;format=xml">
+<style id="wp-img-auto-sizes-contain-inline-css" type="text/css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id="wp-emoji-styles-inline-css" type="text/css">
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<style id="wp-block-library-inline-css" type="text/css">
+:root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}.has-text-align-center{text-align:center}.has-text-align-left{text-align:left}.has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-wrap:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style*=border-top-color]){border-top-style:solid}html :where([style*=border-right-color]){border-right-style:solid}html :where([style*=border-bottom-color]){border-bottom-style:solid}html :where([style*=border-left-color]){border-left-style:solid}html :where([style*=border-width]){border-style:solid}html :where([style*=border-top-width]){border-top-style:solid}html :where([style*=border-right-width]){border-right-style:solid}html :where([style*=border-bottom-width]){border-bottom-style:solid}html :where([style*=border-left-width]){border-left-style:solid}html :where(img[class*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
+
+/*# sourceURL=wp-block-library-inline-css */
+</style>
+<style id="classic-theme-styles-inline-css" type="text/css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+<style id="global-styles-inline-css" type="text/css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--dark-gray: #373737;--wp--preset--color--medium-gray: #cccccc;--wp--preset--color--light-gray: #eeeeee;--wp--preset--color--blue: #1982d1;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 14px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 24px;--wp--preset--font-size--x-large: 42px;--wp--preset--font-size--normal: 16px;--wp--preset--font-size--huge: 26px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link rel="stylesheet" id="wp-syntax-css-css" href="/wp-content/plugins/wp-syntax/css/wp-syntax.css?ver=1.2" type="text/css" media="all">
+<link rel="stylesheet" id="genericons-css" href="/wp-content/themes/catch-box/genericons/genericons.css?ver=3.4.1" type="text/css" media="all">
+<link rel="stylesheet" id="catchbox-style-css" href="/wp-content/themes/catch-box/style.css?ver=20260211-144644" type="text/css" media="all">
+<link rel="stylesheet" id="catchbox-block-style-css" href="/wp-content/themes/catch-box/css/blocks.css?ver=1.0" type="text/css" media="all">
+<script type="text/javascript" src="/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script type="text/javascript" id="catchbox-menu-js-extra">
+/* <![CDATA[ */
+var screenReaderText = {"expand":"expand child menu","collapse":"collapse child menu"};
+//# sourceURL=catchbox-menu-js-extra
+/* ]]> */
+</script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/menu.min.js?ver=2.1.1.1" id="catchbox-menu-js"></script>
+<link rel="https://api.w.org/" href="/wp-json/"><link rel="alternate" title="JSON" type="application/json" href="/wp-json/wp/v2/posts/308"><link rel="EditURI" type="application/rsd+xml" title="RSD" href="/xmlrpc.php?rsd">
+<meta name="generator" content="WordPress 6.9.1">
+<link rel="canonical" href="/2010/04/v8-javascript-engine-embed/">
+<link rel="shortlink" href="/?p=308">
+<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style></head>
+
+<body class="wp-singular post-template-default single single-post postid-308 single-format-standard wp-embed-responsive wp-theme-catch-box single-author right-sidebar one-menu header-image-top">
+
+    
+    
+    <div id="page" class="hfeed site">
+
+        <a href="#main" class="skip-link screen-reader-text">Skip to content</a>
+        <header id="branding" role="banner">
+
+            
+            <div id="header-content" class="clearfix">
+
+                <div class="logo-wrap clearfix">	<div id="hgroup" class="site-details">
+					<p id="site-title"><a href="/" rel="home">麦田的小黑屋</a></p>
+			
+   	</div><!-- #hgroup -->
+</div><!-- .logo-wrap -->	<form role="search" method="get" class="searchform" action="/">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input type="search" class="search-field" placeholder="Search" value="" name="s" title="Search for:">
+		</label>
+		<button type="submit" class="search-submit"><span class="screen-reader-text">Search</span></button>
+	</form>
+
+            </div><!-- #header-content -->
+
+                <div class="menu-access-wrap mobile-header-menu clearfix">
+        <div id="mobile-header-left-menu" class="mobile-menu-anchor page-menu">
+            <a href="#mobile-header-left-nav" id="menu-toggle-primary" class="genericon genericon-menu">
+                <span class="mobile-menu-text">Menu</span>
+            </a>
+        </div><!-- #mobile-header-left-menu -->
+            
+        
+        <div id="site-header-menu-primary" class="site-header-menu">
+            <nav id="access" class="main-navigation menu-focus" role="navigation" aria-label="Primary Menu">
+            
+                <h3 class="screen-reader-text">Primary menu</h3>
+                <div class="menu-header-container"><ul class="menu"><li><a href="/">首页</a></li><li class="page_item page-item-2"><a href="/about/">关于</a></li></ul></div><!-- .menu-header-container -->            </nav><!-- #access -->
+        </div><!-- .site-header-menu -->
+
+            </div><!-- .menu-access-wrap -->
+    
+        </header><!-- #branding -->
+
+        
+        
+        <div id="main" class="clearfix">
+
+            
+            <div id="primary" class="content-area">
+
+                
+                <div id="content" role="main">
+                    
+				
+<article id="post-308" class="post-308 post type-post status-publish format-standard hentry category-uncategorized tag-javascript-engine tag-v8">
+	<header class="entry-header">
+		<h1 class="entry-title">(译)V8 JavaScript 引擎 – 嵌入者指南</h1>
+
+		            <div class="entry-meta">
+                <span class="sep">Posted on </span><a href="/2010/04/v8-javascript-engine-embed/" title="15:16" rel="bookmark"><time class="entry-date updated" datetime="2010-04-24T15:16:46+08:00" pubdate>2010-04-24</time></a><span class="by-author"> <span class="sep"> by </span> <span class="author vcard"><a class="url fn n" href="/author/admin/" title="View all posts by mtian" rel="author">mtian</a></span></span>                                    <span class="sep sep-comment"> — </span>
+                    <span class="comments-link">
+                        <a href="/2010/04/v8-javascript-engine-embed/#comments">5 Comments ↓</a>                    </span>
+                            </div><!-- .entry-meta -->
+			</header><!-- .entry-header -->
+
+	<div class="entry-content">
+		<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #1677ff; margin: 0 0 25px 0; font-family: -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;">
+  <p style="margin: 0 0 10px 0; font-size: 16px; color: #333; line-height: 1.6;">
+    后续更新迁移至个人微信公众号：
+  </p>
+  <div style="margin: 10px 0; text-align: center;">
+    <img decoding="async" src="/wp-content/uploads/2026/02/8040ce2f10694766ab96b8b431fd68a9.jpg" alt="微信公众号二维码" style="width: 150px; height: 150px; border: none;">
+  </div>
+  <p style="margin: 10px 0; font-size: 16px; color: #333; line-height: 1.6;">
+    亦有邮箱可供联系：<a href="mailto:274048862@qq.com" style="color: #1677ff; text-decoration: none;">274048862@qq.com</a>
+  </p>
+  <p style="margin: 10px 0 0 0; font-size: 16px; color: #333; line-height: 1.6;">
+    感谢一路支持
+  </p>
+</div><p><a href="/wp-content/uploads/2010/04/local_persist_handles_review.png"></a><a href="/wp-content/uploads/2010/04/intro_contexts.png"></a>译自：<a href="http://code.google.com/apis/v8/embed.html">http://code.google.com/apis/v8/embed.html</a></p>
+<p>如果你已经读过<a href="http://code.google.com/apis/v8/get_started.html">入门指导</a>，你会已经熟悉把v8作为一个独立的虚拟机来使用，并且有了一些关于v8的概念，比如 handles, scopes, 和 contexts。这个文档将进一步的讨论这些概念，并介绍其他一些在嵌入v8到你的C++程序时需要了解的概念。</p>
+<p>V8 的API提供了编译并执行脚本、访问 C++ 方法和数据结构、错误处理和安全检查。你的程序可以像使用其他库一样使用V8。你的C++代码可以在包含<span style="color: #008000;">include/v8.h</span>后通过使用 V8 API 来访问 V8。</p>
+<p><a href="http://code.google.com/apis/v8/design.html">V8 设计元素</a>这个文档提供了一些你为 V8 而优化自己程序时有用的背景概念。</p>
+<h2>读者</h2>
+<p>本文档适用于想要将 V8 JavaScript 引擎嵌入到 C++ 程序中的 C++ 程序员。这将有助于你使用 JavaScript 调用你自己程序中的 C++ 对象和方法，并且可以让你的 C++ 程序调用 JavaScript 对象和函数。<br>
+<span id="more-308"></span></p>
+<h2>句柄和垃圾收集</h2>
+<p>句柄提供了一个 JavaScript 对象在堆中位置的引用。V8 的垃圾收集器将把不再使用的对象的内存回收掉。在垃圾收集过程中，垃圾收集器经常吧对象移动到堆中的另外一个位置。当垃圾收集器移动一个对象时，垃圾收集器会把所有的指向该对象的句柄更新为对象的新地址。</p>
+<p>如果一个对象无法从 JavaScript 中访问，并且没有句柄指向它时，它将被认定为垃圾。垃圾收集器不断的移除所有被认定为垃圾的对象。V8 的垃圾收集机制是V8性能的一个关键。可以通过查看V8<a href="http://code.google.com/apis/v8/design.html">设计元素</a>来了解更多。</p>
+<p>这里有两种类型的句柄：</p>
+<p style="padding-left: 30px;">*本地句柄。本地句柄在栈上，并且当指定的析构函数被调用时删除。这些句柄的生存时间由句柄范围决定，句柄范围经常在一个函数的开始的时候被创建。当句柄范 围被删除时，垃圾收集器将自由的析构掉那些前面在句柄范围内被句柄引用的对象，只要那些对象不再被JavaScript 访问或者不被其他的句柄引用。这类的句柄在入门的示例中使用过。</p>
+<p style="padding-left: 30px;">类<span style="color: #008000;">Local&lt;SomeType&gt;</span>产生的本地句柄同样可以被存储在父类<span style="color: #008000;">Handle&lt;SomeType&gt;</span>声明的句柄里。</p>
+<p style="padding-left: 30px;">注意：句柄栈不是C++栈的一部分，但是句柄范围是嵌入到C++栈中的。句柄范围只能是在栈上分配的，不能通过<span style="color: #008000;">new</span>来分配。</p>
+<p style="padding-left: 30px;">* 持久句柄。持久句柄并不在栈上分配，并且只有你指定移除它们时才被删除。就想一个本地句柄一样，一个持久句柄将提供一个堆上分配对象的引用。当你需要在不止一个函数中使用一个对象的引用或者句柄生命并不对应于 C++ 的范围时，你可以使用一个持久句柄来保持对那个对象的引用。例如， Google Chrome 使用持久句柄来引用 DOM 节点。一个持久的句柄通过 <span style="color: #008000;">Persistent::New</span> 来创建，并且通过<span style="color: #008000;">Persistent::Dispose</span> 来销毁。持久句柄可以通过 <span style="color: #008000;">Persistent::MakeWeak</span> 来设置为弱，当对一个对象的引用都是弱的持久句柄时将触发垃圾收集器的一个回调函数。</p>
+<p style="padding-left: 30px;">类 <span style="color: #008000;">Persistent&lt;SomeType&gt;</span> 产生的持久句柄同样可以被存储在父类 <span style="color: #008000;">Handle&lt;SomeType&gt;</span> 声明的句柄里。</p>
+<p>当然，每次你创建一个对象的时候都创建一个句柄将会产生很多句柄。这就是为什么句柄范围非常有用。你可以把句柄范围看做一个持有许多句柄的容器。当句柄范围的析构函数被调用时，所有在那个范围中创建的句柄都将被从栈中移除。如你所愿，这将导致句柄指向的对象被垃圾收集器从堆上删除。</p>
+<p>回到我们在<a href="http://code.google.com/apis/v8/get_started.html">入门</a>中非常简单的例子上，在下面的的图表中，你可以看到基于栈和基于堆的对象。注意 <span style="color: #008000;">Context::New()</span> 返回了一个不在句柄栈上的持久句柄。</p>
+<p><img fetchpriority="high" decoding="async" title="local_persist_handles_review" src="/wp-content/uploads/2010/04/local_persist_handles_review.png" alt="" width="748" height="301"></p>
+<p>当析构函数<span style="color: #008000;"> HandleScope::~HandleScope</span> 被调用时，句柄范围将被删除。在这个被删除句柄范围中句柄引用的对象如果没有其他的引用的话，将在下一次的垃圾收集中被移除。当 <span style="color: #008000;">source_obj</span> 和 <span style="color: #008000;">script_obj</span> 不再继续被其他的句柄引用或者不能再从 JavaScript 中访问的时候，垃圾收集器也会从堆上把他移除。因为 context 句柄是一个持久句柄，他在句柄范围退出时并不会被删除。只能通过显式的调用 <span style="color: #008000;">Dispose </span>来删掉context句柄。</p>
+<p>注意：在这个文档中简写的句柄指本地句柄，当讨论到一个持久句柄时将使用全称。</p>
+<h2>Context</h2>
+<p>在V8中，context 是一个允许独立无关的 JavaScript 应用运行在一个独立的V8实例的执行环境。你必须显式的指定你要运行的JavaScript 代码的context 。</p>
+<p>为什么是必须的？因为 JavaScript 提供了一系列 JavaScript 代码可以修改的内置方法和对象。例如，如果两个无关的JavaScript 对象都用同一个方法修改了全局对象，那么可能会发生未知的结果。</p>
+<p>从CPU时间和资源上考虑，为若干必须内置的对象而创建一个新的执行环境代价比较昂贵。但是，V8 的扩展缓存机制保证你在创建第一个context 可能比较昂贵，但是子 context 会比较廉价。这是因为第一个 context 需要去创建内置对象并且解析内置的 JavaScript 代码，而子 context 只需要为它的 context 创建内置对象。v8的快照功能（默认打开，编译选项<span style="color: #008000;">snapshot=yes</span>来激活）花时间创建的第一个context将是非常优化的一个快照，因为它包含了一个已经为内置 JavaScript 代码编译好的代码的序列化的堆。同垃圾收集一样， V8 的扩展缓存机制也是v8性能的一个关键，更多信息可以参考  <a href="http://code.google.com/apis/v8/design.html">V8 设计元素</a>。</p>
+<p>当你创建了一个 context 后，你可以进入和退出任意次。当你在context A时你也可以进入另外一个context B，这意味着你用B替换A来作为你的当前context。当你退出B后，A就被还原为当前环境。图解如下：</p>
+<p style="text-align: center;"><img decoding="async" class="aligncenter" title="intro_contexts" src="/wp-content/uploads/2010/04/intro_contexts.png" alt="" width="417" height="485"></p>
+<p>注意：内置的方法和对象对每个context来说是独立的。你可以有选择的为你的context设置安全令牌。更多的信息请查看安全模块部分。</p>
+<p>在 V8 context的驱动下，浏览器的每个窗口和框架都可以有他自己干净的 JavaScript 环境。</p>
+<h2>模板</h2>
+<p>模板是 JavaScript 函数和对象在一个context中的蓝图。你可以用模板去把 C++ 函数和数据结构包装到 JavaScript 对象中，这样他们就可以被JavaScript 脚本调用了。例如，Google Chrome 就使用模板把 C++ DOM 节点包装成一个 JavaScript 对象，并且在全局命名空间中设置了一些函数。你可以创建一系列的模板，并在你创建的每个新 context 中使用同样的他们。你可以创建你需要的任意多的模板。但是在任何给定的 context中，对任意模板只能有一个实例。</p>
+<p>在 JavaScript 中，函数和对象有很强的二元性。在 Java 和 C++ 中你可以通过显示的定义一个类来创建一种新的对象。在 JavaScript 中，你可以创建一个新的函数，并且使用函数作为构造函数来创建一个实例。一个JavaScript 对象的构造和功能是同构造他的函数紧密相连的。这反映在了V8 模板的工作方式中。有两种模板：</p>
+<p style="padding-left: 30px;">*函数模板<br>
+函数模板是一个独立函数的蓝图。在你希望初始化 JavaScript 函数的 context 中，你可以通过调用模板的GetFunction方法来建立一个模板的JavaScript 实例。你也可以将一个 C++ 回调函数同一个函数模板关联起来，当 JavaScript 函数实例被调用的时候它将被调用。</p>
+<p style="padding-left: 30px;">*对象模板<br>
+每个函数模板都有一个关联的对象模板。这是用来配置通过用这个函数作为构造函数创建的对象。你可以关联两种 C++ 回调函数到对象模板上：<br>
+– 访问器回调函数，当指定的对象属性被脚本访问的时候被调用。<br>
+– 拦截器回调函数，当任意对象属性被脚本访问的时候被调用。<br>
+访问器和拦截器将在本文档的后面讨论。</p>
+<p>下面的代码提供了一个为全局对象创建模板并且设置全局函数的例子。</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #666666;">// Create a template for the global object and set the</span>
+<span style="color: #666666;">// built-in global functions.</span>
+Handle<span style="color: #000080;">&lt;</span>ObjectTemplate<span style="color: #000080;">&gt;</span> global <span style="color: #000080;">=</span> ObjectTemplate<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+global<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>Set<span style="color: #008000;">(</span>String<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;log&quot;</span><span style="color: #008000;">)</span>, FunctionTemplate<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span>LogCallback<span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+<span style="color: #666666;">// Each processor gets its own context so different processors</span>
+<span style="color: #666666;">// do not affect each other.</span>
+Persistent<span style="color: #000080;">&lt;</span>Context<span style="color: #000080;">&gt;</span> context <span style="color: #000080;">=</span> Context<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #0000ff;">NULL</span>, global<span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">// Create a template for the global object and set the
+// built-in global functions.
+Handle&lt;ObjectTemplate&gt; global = ObjectTemplate::New();
+global-&gt;Set(String::New(&quot;log&quot;), FunctionTemplate::New(LogCallback));
+
+// Each processor gets its own context so different processors
+// do not affect each other.
+Persistent&lt;Context&gt; context = Context::New(NULL, global);</p></div>
+
+<p>这个示例代码摘自 <span style="color: #008000;">process.cc</span> 实例中的 <span style="color: #008000;">JsHttpProcessor::Initializer</span> 。</p>
+<h2>访问器</h2>
+<p>访问器是一个计算并且返回一个值的 C++ 回调函数，将在一个对象的属性被 JavaScript 脚本访问时调用。访问器通过对象模板的<span style="color: #008000;">SetAccessor</span>方法设置。这个方法需要被关联属性的名字和在脚本试图读写该属性时调用的两个回调函数。</p>
+<p>访问器的复杂度取决于你操纵的数据类型。</p>
+<p><strong>访问静态全局变量</strong></p>
+<p>比方说，这里有两个C++整形变量 <span style="color: #008000;">x</span> 和 <span style="color: #008000;">y </span>需要在一个 context 中被 JavaScript 作为一个全局变量来访问。 要做到这一点，每当一个脚本需要去读写这些变量时，你需要去调用 C++ 访问器函数。这些访问器函数通过使用 <span style="color: #008000;">Integer::New</span> 转换一个 C++ 整形到一个 JavaScript 整形，并且使用<span style="color: #008000;">Int32Value</span> 去转换一个 JavaScript 整形到一个 C++ 整形。示例代码如下：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">  Handle<span style="color: #000080;">&lt;</span>Value<span style="color: #000080;">&gt;</span> XGetter<span style="color: #008000;">(</span>Local<span style="color: #000080;">&lt;</span>String<span style="color: #000080;">&gt;</span> property, 
+                        <span style="color: #0000ff;">const</span> AccessorInfo<span style="color: #000040;">&amp;</span> info<span style="color: #008000;">)</span> <span style="color: #008000;">{</span>
+    <span style="color: #0000ff;">return</span> Integer<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span>x<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+  <span style="color: #008000;">}</span>
+ 
+  <span style="color: #0000ff;">void</span> XSetter<span style="color: #008000;">(</span>Local<span style="color: #000080;">&lt;</span>String<span style="color: #000080;">&gt;</span> property, Local<span style="color: #000080;">&lt;</span>Value<span style="color: #000080;">&gt;</span> value,
+               <span style="color: #0000ff;">const</span> AccessorInfo<span style="color: #000040;">&amp;</span> info<span style="color: #008000;">)</span> <span style="color: #008000;">{</span>
+    x <span style="color: #000080;">=</span> value<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>Int32Value<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+  <span style="color: #008000;">}</span>
+ 
+  <span style="color: #666666;">// YGetter/YSetter are so similar they are omitted for brevity</span>
+ 
+  Handle<span style="color: #000080;">&lt;</span>ObjectTemplate<span style="color: #000080;">&gt;</span> global_templ <span style="color: #000080;">=</span> ObjectTemplate<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+  global_templ<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>SetAccessor<span style="color: #008000;">(</span>String<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;x&quot;</span><span style="color: #008000;">)</span>, XGetter, XSetter<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+  global_templ<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>SetAccessor<span style="color: #008000;">(</span>String<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;y&quot;</span><span style="color: #008000;">)</span>, YGetter, YSetter<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+  Persistent<span style="color: #000080;">&lt;</span>Context<span style="color: #000080;">&gt;</span> context <span style="color: #000080;">=</span> Context<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #0000ff;">NULL</span>, global_templ<span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">  Handle&lt;Value&gt; XGetter(Local&lt;String&gt; property, 
+                        const AccessorInfo&amp; info) {
+    return Integer::New(x);
+  }
+    
+  void XSetter(Local&lt;String&gt; property, Local&lt;Value&gt; value,
+               const AccessorInfo&amp; info) {
+    x = value-&gt;Int32Value();
+  }
+       
+  // YGetter/YSetter are so similar they are omitted for brevity
+  
+  Handle&lt;ObjectTemplate&gt; global_templ = ObjectTemplate::New();
+  global_templ-&gt;SetAccessor(String::New(&quot;x&quot;), XGetter, XSetter);
+  global_templ-&gt;SetAccessor(String::New(&quot;y&quot;), YGetter, YSetter);
+  Persistent&lt;Context&gt; context = Context::New(NULL, global_templ);</p></div>
+
+<p>注意：代码中的对象模板在 context 创建的时候就被创建。模板可以被创建并在任意数量的 context 中使用。</p>
+<p><strong>访问动态变量</strong></p>
+<p>在先前的示例中，变量是静态的，全局的。如果被操纵的数据是动态的呢？比如浏览器中实际使用的 DOM 树。让我们把<span style="color: #008000;"> x</span> 和<span style="color: #008000;"> y</span>看作是C++类<span style="color: #008000;">Point </span>的成员吧：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">  <span style="color: #0000ff;">class</span> Point <span style="color: #008000;">{</span>
+   <span style="color: #0000ff;">public</span><span style="color: #008080;">:</span>
+    Point<span style="color: #008000;">(</span><span style="color: #0000ff;">int</span> x, <span style="color: #0000ff;">int</span> y<span style="color: #008000;">)</span> <span style="color: #008080;">:</span> x_<span style="color: #008000;">(</span>x<span style="color: #008000;">)</span>, y_<span style="color: #008000;">(</span>y<span style="color: #008000;">)</span> <span style="color: #008000;">{</span> <span style="color: #008000;">}</span>
+    <span style="color: #0000ff;">int</span> x_, y_<span style="color: #008080;">;</span>
+  <span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">  class Point {
+   public:
+    Point(int x, int y) : x_(x), y_(y) { }
+    int x_, y_;
+  }</p></div>
+
+<p>为了使任意数量的C++<span style="color: #008000;"> point</span>实例可以在 JavaScript 中使用，我们需要去对每一个C++ <span style="color: #008000;">point</span>创建一个JavaScript 对象，并且在JavaScript 对象和 C++ 实例中建立关联。这可以通过外部值和内部对象字段来实现。</p>
+<p>首先需要为<span style="color: #008000;">point</span>包装对象创建一个对象模板:</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">  Handle<span style="color: #000080;">&lt;</span>ObjectTemplate<span style="color: #000080;">&gt;</span> point_templ <span style="color: #000080;">=</span> ObjectTemplate<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span>
+<span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">  Handle&lt;ObjectTemplate&gt; point_templ = ObjectTemplate::New()
+;</p></div>
+
+<p>每个JavaScript <span style="color: #008000;">point</span>对象都保持一个C++对象的关联，因为他包裹了一个内部字段。这些字段被这样命名，因为他们不能从JavaScript 中访问，他们只能从C++代码中访问。一个对象可以有任意数量的内部字段，内部字段的数量通过下面的代码来设定。</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">  point_templ<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>SetInternalFieldCount<span style="color: #008000;">(</span><span style="color: #0000dd;">1</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">  point_templ-&amp;gt;SetInternalFieldCount(1);</p></div>
+
+<p>这里内部字段的数量被设置为1，这意味着对象有一个索引为0的内部字段，这个字段指向一个C++对象。</p>
+<p>在模版中添加<span style="color: #008000;">x</span>和<span style="color: #008000;">y</span>的访问器：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">  point_templ.<span style="color: #007788;">SetAccessor</span><span style="color: #008000;">(</span>String<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;x&quot;</span><span style="color: #008000;">)</span>, GetPointX, SetPointX<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+  point_templ.<span style="color: #007788;">SetAccessor</span><span style="color: #008000;">(</span>String<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;y&quot;</span><span style="color: #008000;">)</span>, GetPointY, SetPointY<span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">  point_templ.SetAccessor(String::New(&quot;x&quot;), GetPointX, SetPointX);
+  point_templ.SetAccessor(String::New(&quot;y&quot;), GetPointY, SetPointY);</p></div>
+
+<p>下一步，通过创建一个模版的实例来包装一个C++ point，并且设置point <span style="color: #008000;">p</span>外部包装的内部字段为<span style="color: #008000;">0</span>.</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">  Point<span style="color: #000040;">*</span> p <span style="color: #000080;">=</span> ...<span style="color: #008080;">;</span>
+  Local<span style="color: #000080;">&lt;</span>Object<span style="color: #000080;">&gt;</span> obj <span style="color: #000080;">=</span> point_templ<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>NewInstance<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+  obj<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>SetInternalField<span style="color: #008000;">(</span><span style="color: #0000dd;">0</span>, External<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span>p<span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">  Point* p = ...;
+  Local&lt;Object&gt; obj = point_templ-&gt;NewInstance();
+  obj-&gt;SetInternalField(0, External::New(p));</p></div>
+
+<p>这个外部对象只是简单的包装了一个 <span style="color: #008000;">void*</span> 。外部对象只能用于在内部字段中存放一个引用。JavaScript 对象不能直接指向 C++对象，所以这个外部值是作为从 JavaScript 到 C++ 的桥梁来使用的。从这方面上来讲，外部对象与句柄是相对应的，因为句柄让 C++ 可以引用到 JavaScript 对象。</p>
+<p>这就是 <span style="color: #008000;">x</span> 的 <span style="color: #008000;">get </span>和<span style="color: #008000;"> set</span> 的访问器的定义，<span style="color: #008000;">y</span> 的访问器定义与 <span style="color: #008000;">x</span> 相同，只须把 <span style="color: #008000;">x</span> 替换为 <span style="color: #008000;">y</span> 就可。</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">  Handle<span style="color: #000080;">&lt;</span>Value<span style="color: #000080;">&gt;</span> GetPointX<span style="color: #008000;">(</span>Local<span style="color: #000080;">&lt;</span>String<span style="color: #000080;">&gt;</span> property,
+                          <span style="color: #0000ff;">const</span> AccessorInfo <span style="color: #000040;">&amp;</span>info<span style="color: #008000;">)</span> <span style="color: #008000;">{</span>
+    Local<span style="color: #000080;">&lt;</span>Object<span style="color: #000080;">&gt;</span> self <span style="color: #000080;">=</span> info.<span style="color: #007788;">Holder</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+    Local<span style="color: #000080;">&lt;</span>External<span style="color: #000080;">&gt;</span> wrap <span style="color: #000080;">=</span> Local<span style="color: #000080;">&lt;</span>External<span style="color: #000080;">&gt;</span><span style="color: #008080;">::</span><span style="color: #007788;">Cast</span><span style="color: #008000;">(</span>self<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>GetInternalField<span style="color: #008000;">(</span><span style="color: #0000dd;">0</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+    <span style="color: #0000ff;">void</span><span style="color: #000040;">*</span> ptr <span style="color: #000080;">=</span> wrap<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>Value<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+    <span style="color: #0000ff;">int</span> value <span style="color: #000080;">=</span> <span style="color: #0000ff;">static_cast</span><span style="color: #000080;">&lt;</span>Point<span style="color: #000040;">*</span><span style="color: #000080;">&gt;</span><span style="color: #008000;">(</span>ptr<span style="color: #008000;">)</span><span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>x_<span style="color: #008080;">;</span>
+    <span style="color: #0000ff;">return</span> Integer<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span>value<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+  <span style="color: #008000;">}</span>
+ 
+  <span style="color: #0000ff;">void</span> SetPointX<span style="color: #008000;">(</span>Local<span style="color: #000080;">&lt;</span>String<span style="color: #000080;">&gt;</span> property, Local<span style="color: #000080;">&lt;</span>Value<span style="color: #000080;">&gt;</span> value,
+                 <span style="color: #0000ff;">const</span> AccessorInfo<span style="color: #000040;">&amp;</span> info<span style="color: #008000;">)</span> <span style="color: #008000;">{</span>
+    Local<span style="color: #000080;">&lt;</span>Object<span style="color: #000080;">&gt;</span> self <span style="color: #000080;">=</span> info.<span style="color: #007788;">Holder</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+    Local<span style="color: #000080;">&lt;</span>External<span style="color: #000080;">&gt;</span> wrap <span style="color: #000080;">=</span> Local<span style="color: #000080;">&lt;</span>External<span style="color: #000080;">&gt;</span><span style="color: #008080;">::</span><span style="color: #007788;">Cast</span><span style="color: #008000;">(</span>self<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>GetInternalField<span style="color: #008000;">(</span><span style="color: #0000dd;">0</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+    <span style="color: #0000ff;">void</span><span style="color: #000040;">*</span> ptr <span style="color: #000080;">=</span> wrap<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>Value<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+    <span style="color: #0000ff;">static_cast</span><span style="color: #000080;">&lt;</span>Point<span style="color: #000040;">*</span><span style="color: #000080;">&gt;</span><span style="color: #008000;">(</span>ptr<span style="color: #008000;">)</span><span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>x_ <span style="color: #000080;">=</span> value<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>Int32Value<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+  <span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">  Handle&lt;Value&gt; GetPointX(Local&lt;String&gt; property,
+                          const AccessorInfo &amp;info) {
+    Local&lt;Object&gt; self = info.Holder();
+    Local&lt;External&gt; wrap = Local&lt;External&gt;::Cast(self-&gt;GetInternalField(0));
+    void* ptr = wrap-&gt;Value();
+    int value = static_cast&lt;Point*&gt;(ptr)-&gt;x_;
+    return Integer::New(value);
+  }
+  
+  void SetPointX(Local&lt;String&gt; property, Local&lt;Value&gt; value,
+                 const AccessorInfo&amp; info) {
+    Local&lt;Object&gt; self = info.Holder();
+    Local&lt;External&gt; wrap = Local&lt;External&gt;::Cast(self-&gt;GetInternalField(0));
+    void* ptr = wrap-&gt;Value();
+    static_cast&lt;Point*&gt;(ptr)-&gt;x_ = value-&gt;Int32Value();
+  }</p></div>
+
+<p>访问器释放了本来被 JavaScript 对象包装起来的 <span style="color: #008000;">point</span> 对象的引用，并且读写关联的字段。这样的话，这些通用的访问器可以用在任意数量的包装的 point 对象上。</p>
+<h2>拦截器</h2>
+<p>你同样可以指定一个回调函数给一个脚本访问任意对象的属性时被调用。这叫做拦截器。为了效率，这里有两种拦截器。</p>
+<p style="padding-left: 30px;">* 名称属性拦截器 – 当通过字符串名称访问属性时被调用。例如，在浏览器的环境下，<span style="color: #008000;">document.theFormName.elementName </span>。</p>
+<p style="padding-left: 30px;">* 索引属性拦截器 – 当通过索引访问属性时被调用。例如，在浏览器的环境下，<span style="color: #008000;">document.forms.elements[0]</span> 。</p>
+<p>随 V8 源码提供的示例 <span style="color: #008000;">process.cc</span> 中包括一个使用拦截器的示例。在下面的代码片段中 <span style="color: #008000;">SetNamedPropertyHandler</span> 指定了 <span style="color: #008000;">MapGet </span>和 <span style="color: #008000;">MapSet</span> 拦截器。</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">Handle<span style="color: #000080;">&lt;</span>ObjectTemplate<span style="color: #000080;">&gt;</span> result <span style="color: #000080;">=</span> ObjectTemplate<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+result<span style="color: #000040;">-</span><span style="color: #000080;">&gt;</span>SetNamedPropertyHandler<span style="color: #008000;">(</span>MapGet, MapSet<span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">Handle&lt;ObjectTemplate&gt; result = ObjectTemplate::New();
+result-&gt;SetNamedPropertyHandler(MapGet, MapSet);</p></div>
+
+<p><span style="color: #008000;">MapGet </span>拦截器如下所示：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">Handle JsHttpRequestProcessor<span style="color: #008080;">::</span><span style="color: #007788;">MapGet</span><span style="color: #008000;">(</span>Local name,
+                                             <span style="color: #0000ff;">const</span> AccessorInfo <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>info<span style="color: #008000;">)</span> <span style="color: #008000;">{</span>
+  <span style="color: #666666;">// Fetch the map wrapped by this object.</span>
+  map <span style="color: #000040;">*</span>obj <span style="color: #000080;">=</span> UnwrapMap<span style="color: #008000;">(</span>info.<span style="color: #007788;">Holder</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+  <span style="color: #666666;">// Convert the JavaScript string to a std::string.</span>
+  string key <span style="color: #000080;">=</span> ObjectToString<span style="color: #008000;">(</span>name<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+  <span style="color: #666666;">// Look up the value if it exists using the standard STL idiom.</span>
+  map<span style="color: #008080;">::</span><span style="color: #007788;">iterator</span> iter <span style="color: #000080;">=</span> obj<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>find<span style="color: #008000;">(</span>key<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+  <span style="color: #666666;">// If the key is not present return an empty handle as signal.</span>
+  <span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span>iter <span style="color: #000080;">==</span> obj<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>end<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span> <span style="color: #0000ff;">return</span> Handle<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ 
+  <span style="color: #666666;">// Otherwise fetch the value and wrap it in a JavaScript string.</span>
+  <span style="color: #0000ff;">const</span> string <span style="color: #000040;">&amp;</span>amp<span style="color: #008080;">;</span>value <span style="color: #000080;">=</span> <span style="color: #008000;">(</span><span style="color: #000040;">*</span>iter<span style="color: #008000;">)</span>.<span style="color: #007788;">second</span><span style="color: #008080;">;</span>
+  <span style="color: #0000ff;">return</span> String<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span>value.<span style="color: #007788;">c_str</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span>, value.<span style="color: #007788;">length</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+<span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">Handle JsHttpRequestProcessor::MapGet(Local name,
+                                             const AccessorInfo &amp;amp;info) {
+  // Fetch the map wrapped by this object.
+  map *obj = UnwrapMap(info.Holder());
+
+  // Convert the JavaScript string to a std::string.
+  string key = ObjectToString(name);
+
+  // Look up the value if it exists using the standard STL idiom.
+  map::iterator iter = obj-&amp;gt;find(key);
+
+  // If the key is not present return an empty handle as signal.
+  if (iter == obj-&amp;gt;end()) return Handle();
+
+  // Otherwise fetch the value and wrap it in a JavaScript string.
+  const string &amp;amp;value = (*iter).second;
+  return String::New(value.c_str(), value.length());
+}</p></div>
+
+<p>像访问器一样，当一个属性被访问时指定的回调函数就会被激活。访问器和拦截器的区别就在于拦截器处理所有的属性，而访问器只与指定的属性相关联。</p>
+<h2>安全模型</h2>
+<p>同源策略（首先在Netscape Navigator 2.0引入）阻止从一个来源加载的脚本和文档去访问或设置另外一个来源的文档。同源在这里是指域名 (www.example.com),、协议 (http 或 https)和端口 (例如, www.example.com:81 与 www.example.com 是不同的)相同。这三个都相同的两个网页才能被认定为同源。没有这个保护的话，恶意的网页可能危害到另外一个正常的网页。</p>
+<p>在 V8 中，同源被定义为一个 context。访问任何一个并非调用你的 context 在默认情况下是被阻止的。为了访问并非调用你的context，你需要使用安全令牌，或者安全回调函数。一个安全令牌可以是任何值，但通常是一个不在其他地方存在的符号或者规范的字符串。在你建立一个context时，你可以有选择使用<span style="color: #008000;">SetSecurityToken</span>指定一个安全令牌。如果你不指定安全令牌的话，V8 会自动为你创建的 context 生成一个。</p>
+<p>当试图访问一个全局变量时，V8 的安全系统会首先检查被访问的全局对象的安全令牌并同试图访问全局对象的代码的安全令牌做对比。如果令牌匹配的话，访问就被允许。如果令牌不匹配的话, V8 会调用回调函数来判断这个访问是否应该被允许。你可以通过使用对象模版的 SetAccessCheckCallbacks 方法设置对象的安全回调函数，以此来指定是否允许访问该对象。V8的安全系统可以获取被访问对象的安全回调函数，并且调用它来判断是否允许另外一个 context 去访问它。被访问的对象、被访问的属性名、访问的类型（例如读、写和删除）将被传递给回调函数，回调函数会返回是否允许访问。</p>
+<p>Google Chrome 中实施了这个机制，所以一旦安全令牌匹配不上，指定的回调函数会只允许以下操作：<span style="color: #008000;">window.focus(), window.blur(), window.close(), window.location, window.open(), history.forward(), history.back(),</span> 和 <span style="color: #008000;">history.go().</span>g</p>
+<h2>异常</h2>
+<p>当错误发生时，v8会抛出一个异常。比如，当一个脚本或者函数试图去访问一个并不存在的属性，或者调用一个并不是函数的函数。</p>
+<p>当操作失败的时候V8会返回一个空句柄。所以在继续执行前，在代码中检查返回值是否为一个空句柄是非常重要的。可以通过 <span style="color: #008000;">Handle </span>类中的公共函数<span style="color: #008000;"> IsEmpty()</span> 来判断一个句柄是否为空。</p>
+<p>你可以使用<span style="color: #008000;">TryCatch</span>来捕获异常，如下所示：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;">  TryCatch trycatch<span style="color: #008080;">;</span>
+  Handle v <span style="color: #000080;">=</span> script<span style="color: #000040;">-</span><span style="color: #000040;">&amp;</span>gt<span style="color: #008080;">;</span>Run<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+  <span style="color: #0000ff;">if</span> <span style="color: #008000;">(</span>v.<span style="color: #007788;">IsEmpty</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008000;">)</span> <span style="color: #008000;">{</span>
+    Handle exception <span style="color: #000080;">=</span> trycatch.<span style="color: #007788;">Exception</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+    String<span style="color: #008080;">::</span><span style="color: #007788;">AsciiValue</span> exception_str<span style="color: #008000;">(</span>exception<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+    <span style="color: #0000dd;">printf</span><span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;Exception: %s<span style="color: #000099; font-weight: bold;">\n</span>&quot;</span>, <span style="color: #000040;">*</span>exception_str<span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+    <span style="color: #666666;">// ...</span>
+  <span style="color: #008000;">}</span></pre></td></tr></table><p class="theCode" style="display:none;">  TryCatch trycatch;
+  Handle v = script-&amp;gt;Run();
+  if (v.IsEmpty()) {
+    Handle exception = trycatch.Exception();
+    String::AsciiValue exception_str(exception);
+    printf(&quot;Exception: %s\n&quot;, *exception_str);
+    // ...
+  }</p></div>
+
+<p>如果返回值是一个空句柄，并且你没有正确的设置<span style="color: #008000;">TryCatch</span>，你的代码就会崩溃。如果你设置一个<span style="color: #008000;">TryCatch</span>，异常就会被捕获，你的代码可以继续执行。</p>
+<h2>继承</h2>
+<p>JavaScript 是一个类型无关，面向对象的语言，并且其本身使用的是原型继承而非类继承。这可能会使受传统面向对象语言（比如C++ 和 Java.）培训的程序员感到疑惑。</p>
+<p>基于类的面向对象的语言，比如Java 和 C++，是建立在两种截然不同的实体概念上的：类和实例。JavaScript 是一个原形继承的语言，并且不会有这种区别：它只有对象。JavaScript 不支持原生的类型继承声明；但是，JavaScript 的原型机制简化了添加自定义属性和方法到一个对象所有实例的过程。在 JavaScript 中，你可以添加自定义的属性到对象上。例如：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #666666;">// Create an object &quot;bicycle&quot;</span>
+function bicycle<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008000;">{</span>
+<span style="color: #008000;">}</span>
+<span style="color: #666666;">// Create an instance of bicycle called roadbike</span>
+var roadbike <span style="color: #000080;">=</span> <span style="color: #0000dd;">new</span> bicycle<span style="color: #008000;">(</span><span style="color: #008000;">)</span>
+<span style="color: #666666;">// Define a custom property, wheels, on roadbike</span>
+roadbike.<span style="color: #007788;">wheels</span> <span style="color: #000080;">=</span> <span style="color: #0000dd;">2</span></pre></td></tr></table><p class="theCode" style="display:none;">// Create an object &quot;bicycle&quot;
+function bicycle(){
+}
+// Create an instance of bicycle called roadbike
+var roadbike = new bicycle()
+// Define a custom property, wheels, on roadbike
+roadbike.wheels = 2</p></div>
+
+<p>这种方式添加的自定属性值只存在于对象的这个实例上。如果我们创建了另外一个叫做 <span style="color: #008000;">mountainbike </span>的 <span style="color: #008000;">bicycle()</span> 实例，<span style="color: #008000;">mountainbike.wheels</span>会返回未定义，除非我们显式的添加<span style="color: #008000;"> wheels</span> 属性。</p>
+<p>有时候这就是我们所需要的，但是在另外一些情况下，添加自定义属性到一个对象的所有实例可能才是我们需要的，毕竟所有的 bicycles 都有 wheels。这就是为什么原型继承的 JavaScript 非常有用。为了使用原型对象，在添加自定义属性之前，需要用到对象的 <span style="color: #008000;">prototype</span>：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #666666;">// First, create the &quot;bicycle&quot; object</span>
+function bicycle<span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008000;">{</span>
+<span style="color: #008000;">}</span>
+<span style="color: #666666;">// Assign the wheels property to the object's prototype</span>
+bicycle.<span style="color: #007788;">prototype</span>.<span style="color: #007788;">wheels</span> <span style="color: #000080;">=</span> <span style="color: #0000dd;">2</span></pre></td></tr></table><p class="theCode" style="display:none;">// First, create the &quot;bicycle&quot; object
+function bicycle(){
+}
+// Assign the wheels property to the object's prototype
+bicycle.prototype.wheels = 2</p></div>
+
+<p>所有 <span style="color: #008000;">bicycle()</span> 的实例都会有预置的 <span style="color: #008000;">wheels</span> 属性。</p>
+<p>同样的方法也在 V8 的模版中使用了。每个 <span style="color: #008000;">FunctionTemplate </span>都有一个 <span style="color: #008000;">PrototypeTemplate</span> 方法，这个方法给出了函数原型的模版。你可以设置原型并且关联 C++ 方法到那些原型上，通过 <span style="color: #008000;">PrototypeTemplate </span>那些方法和属性会出现在所有对应的 <span style="color: #008000;">FunctionTemplate </span>上。比如：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"> Handle biketemplate <span style="color: #000080;">=</span> FunctionTemplate<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span><span style="color: #008080;">;</span>
+ biketemplate.<span style="color: #007788;">PrototypeTemplate</span><span style="color: #008000;">(</span><span style="color: #008000;">)</span>.<span style="color: #007788;">Set</span><span style="color: #008000;">(</span>
+     String<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span><span style="color: #FF0000;">&quot;wheels&quot;</span><span style="color: #008000;">)</span>,
+     FunctionTemplate<span style="color: #008080;">::</span><span style="color: #007788;">New</span><span style="color: #008000;">(</span>MyWheelsMethodCallback<span style="color: #008000;">)</span>
+ <span style="color: #008000;">)</span></pre></td></tr></table><p class="theCode" style="display:none;"> Handle biketemplate = FunctionTemplate::New();
+ biketemplate.PrototypeTemplate().Set(
+     String::New(&quot;wheels&quot;),
+     FunctionTemplate::New(MyWheelsMethodCallback)
+ )</p></div>
+
+<p>这会导致所有 <span style="color: #008000;">biketemplate </span>的实例在他们的原型链中都有一个 <span style="color: #008000;">wheels </span>方法，当 <span style="color: #008000;">wheels </span>被调用的时候会激活 C++ 函数 <span style="color: #008000;">MyWheelsMethodCallback</span>。</p>
+<p>V8的 <span style="color: #008000;">FunctionTemplate </span>类提供公共成员函数 <span style="color: #008000;">Inherit()</span> ，你可以在你想要一个函数模版去继承另外一个函数模版时调用，如下：</p>
+
+<div class="wp_syntax" style="position:relative;"><table><tr><td class="code"><pre class="cpp" style="font-family:monospace;"><span style="color: #0000ff;">void</span> Inherit<span style="color: #008000;">(</span>Handle parent<span style="color: #008000;">)</span><span style="color: #008080;">;</span></pre></td></tr></table><p class="theCode" style="display:none;">void Inherit(Handle parent);</p></div>
+
+			</div><!-- .entry-content -->
+
+	<footer class="entry-meta">
+		This entry was posted in <a href="/category/uncategorized/" rel="category tag">未分类</a> and tagged <a href="/tag/javascript-engine/" rel="tag">javascript engine</a>, <a href="/tag/v8/" rel="tag">v8</a> by <a href="/author/admin/">mtian</a>. Bookmark the <a href="/2010/04/v8-javascript-engine-embed/" title="Permalink to (译)V8 JavaScript 引擎 – 嵌入者指南" rel="bookmark">permalink</a>.		
+		
+	</footer><!-- .entry-meta -->
+</article><!-- #post-308 -->
+
+	<div id="comments">
+	
+	
+			<h2 id="comments-title">
+			5 Replies to “(译)V8 JavaScript 引擎 – 嵌入者指南”		</h2>
+
+		
+		<ol class="commentlist">
+				<li class="post pingback">
+		<p>Pingback: <a href="http://blog.sunchrome.com/?p=18" class="url" rel="ugc external nofollow">about v8 | SunChrome</a></p>
+	</li><!-- #comment-## -->
+	<li class="comment even thread-even depth-1" id="li-comment-1779">
+		<article id="comment-1779" class="comment">
+			<footer class="comment-meta">
+				<div class="comment-author vcard">
+					<img alt="" src="https://secure.gravatar.com/avatar/161f617a0b5b406793159bded8796886befc2f82cbdb6d59b70596325f36a80f?s=68&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/161f617a0b5b406793159bded8796886befc2f82cbdb6d59b70596325f36a80f?s=136&amp;d=mm&amp;r=g 2x" class="avatar avatar-68 photo" height="68" width="68" decoding="async"><span class="fn"><a href="http://blog.sunchrome.com/" class="url" rel="ugc external nofollow">sc</a></span> on <a href="/2010/04/v8-javascript-engine-embed/#comment-1779"><time pubdate datetime="2010-08-18T16:47:22+08:00">2010-08-18 at 16:47</time></a> <span class="says">said:</span>
+									</div><!-- .comment-author .vcard -->
+
+				
+			</footer>
+
+			<div class="comment-content"><p>这个翻译不是很准确：“模板是 JavaScript 函数和对象在一个context中的蓝图。”</p>
+<p>我翻译如下，不过也不是很准确<br>
+“template 是Context中为JS函数和对象的一种设计。”</p>
+</div>
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="/2010/04/v8-javascript-engine-embed/?replytocom=1779#respond" data-commentid="1779" data-postid="308" data-belowelement="comment-1779" data-respondelement="respond" data-replyto="回复给 sc" aria-label="回复给 sc">Reply <span>↓</span></a>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	<ul class="children">
+	<li class="comment byuser comment-author-admin bypostauthor odd alt depth-2" id="li-comment-1786">
+		<article id="comment-1786" class="comment">
+			<footer class="comment-meta">
+				<div class="comment-author vcard">
+					<img alt="" src="https://secure.gravatar.com/avatar/511144841a2c3adc2353c1964fb6b0eec4cc70497d1136abb1b4bb36a5fd10e2?s=39&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/511144841a2c3adc2353c1964fb6b0eec4cc70497d1136abb1b4bb36a5fd10e2?s=78&amp;d=mm&amp;r=g 2x" class="avatar avatar-39 photo" height="39" width="39" loading="lazy" decoding="async"><span class="fn"><a href="/" class="url" rel="ugc">mtian</a></span> on <a href="/2010/04/v8-javascript-engine-embed/#comment-1786"><time pubdate datetime="2010-08-20T18:17:08+08:00">2010-08-20 at 18:17</time></a> <span class="says">said:</span>
+									</div><!-- .comment-author .vcard -->
+
+				
+			</footer>
+
+			<div class="comment-content"><p>to sc：呵呵，菜鸟一只，翻译的也比较烂。自己看书的时候最讨厌那些翻译的烂的了，没想到自己竟然做这种事。</p>
+</div>
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="/2010/04/v8-javascript-engine-embed/?replytocom=1786#respond" data-commentid="1786" data-postid="308" data-belowelement="comment-1786" data-respondelement="respond" data-replyto="回复给 mtian" aria-label="回复给 mtian">Reply <span>↓</span></a>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+	<li class="comment even thread-odd thread-alt depth-1" id="li-comment-1846">
+		<article id="comment-1846" class="comment">
+			<footer class="comment-meta">
+				<div class="comment-author vcard">
+					<img alt="" src="https://secure.gravatar.com/avatar/0898dbf2c8df05272f2ab7f0307a4ee0c533c179588ac60c8cc95c475a1a6b2b?s=68&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/0898dbf2c8df05272f2ab7f0307a4ee0c533c179588ac60c8cc95c475a1a6b2b?s=136&amp;d=mm&amp;r=g 2x" class="avatar avatar-68 photo" height="68" width="68" loading="lazy" decoding="async"><span class="fn"><a href="http://www.afity.com/" class="url" rel="ugc external nofollow">afity(com){开源社区++;}</a></span> on <a href="/2010/04/v8-javascript-engine-embed/#comment-1846"><time pubdate datetime="2010-10-07T21:36:25+08:00">2010-10-07 at 21:36</time></a> <span class="says">said:</span>
+									</div><!-- .comment-author .vcard -->
+
+				
+			</footer>
+
+			<div class="comment-content"><p>顶，为开源做贡献</p>
+</div>
+
+			<div class="reply">
+				<a rel="nofollow" class="comment-reply-link" href="/2010/04/v8-javascript-engine-embed/?replytocom=1846#respond" data-commentid="1846" data-postid="308" data-belowelement="comment-1846" data-respondelement="respond" data-replyto="回复给 afity(com){开源社区++;}" aria-label="回复给 afity(com){开源社区++;}">Reply <span>↓</span></a>			</div><!-- .reply -->
+		</article><!-- #comment-## -->
+
+	</li><!-- #comment-## -->
+	<li class="post pingback">
+		<p>Pingback: <a href="http://www.osseye.com/?p=414" class="url" rel="ugc external nofollow">人自明 » About V8 js</a></p>
+	</li><!-- #comment-## -->
+		</ol>
+
+		
+	
+		<div id="respond" class="comment-respond">
+		<h2 id="reply-title" class="comment-reply-title">发表回复 <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2010/04/v8-javascript-engine-embed/#respond" style="display:none;">取消回复</a></small></h2><form action="/wp-comments-post.php" method="post" id="commentform" class="comment-form"><p class="comment-notes"><span id="email-notes">您的邮箱地址不会被公开。</span> <span class="required-field-message">必填项已用 <span class="required">*</span> 标注</span></p><p class="comment-form-comment"><label for="comment">评论 <span class="required">*</span></label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required></textarea></p><p class="comment-form-author"><label for="author">Name</label> <span class="required">*</span><input id="author" name="author" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-email"><label for="email">Email</label> <span class="required">*</span><input id="email" name="email" type="text" value="" size="30" aria-required="true"></p>
+<p class="comment-form-url"><label for="url">网站</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200" autocomplete="url"></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="发表评论"> <input type="hidden" name="comment_post_ID" value="308" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p><p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="b113101f4f"></p><p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>Δ<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="8"><script>document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );</script></p></form>	</div><!-- #respond -->
+	
+</div><!-- #comments -->
+	<nav class="navigation post-navigation" aria-label="文章">
+		<h2 class="screen-reader-text">文章导航</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="/2010/04/mdecoder-0-54/" rel="prev"><span class="meta-nav" aria-hidden="true"><span class="nav-icon">←</span> Previous</span> <span class="screen-reader-text">Previous post:</span> <span class="post-title">MDecoder 0.54</span></a></div><div class="nav-next"><a href="/2010/04/%E7%BD%91%E7%AB%99%E6%8C%82%E9%A9%AC%E6%89%AB%E6%8F%8F%E5%99%A8-mscaner-v0-1/" rel="next"><span class="meta-nav" aria-hidden="true">Next <span class="nav-icon">→</span></span> <span class="screen-reader-text">Next post:</span> <span class="post-title">网站挂马扫描器 MScaner V0.1</span></a></div></div>
+	</nav>
+		</div><!-- #content -->
+        
+		            
+	</div><!-- #primary -->
+    
+	    
+
+
+		<aside id="secondary" class="sidebar widget-area" role="complementary">
+			<h2 class="screen-reader-text">Primary Sidebar Widget Area</h2>
+			<section id="categories-269971491" class="widget widget_categories"><h2 class="widget-title">分类</h2>
+			<ul>
+					<li class="cat-item cat-item-49"><a href="/category/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="/category/uncategorized/">未分类</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="/category/%E8%83%A1%E6%80%9D%E4%B9%B1%E6%83%B3/">胡思乱想</a>
+</li>
+			</ul>
+
+			</section>
+		<section id="recent-posts-2" class="widget widget_recent_entries">
+		<h2 class="widget-title">近期文章</h2>
+		<ul>
+											<li>
+					<a href="/2024/04/electron-npm-bug/">electron 应用接入 npm 包的 4 个坑</a>
+									</li>
+											<li>
+					<a href="/2024/04/prefetch-electron/">如何通过预读来加速 Electron 应用启动</a>
+									</li>
+											<li>
+					<a href="/2019/02/varname/">为什么我还在用匈牙利命名法</a>
+									</li>
+											<li>
+					<a href="/2019/02/cstringandbugs/">C++的各种字符串和常见问题</a>
+									</li>
+											<li>
+					<a href="/2019/01/windows%E5%B9%B3%E5%8F%B0%E4%B8%8Bsqlite%E6%8E%A5%E5%8F%A3%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">sqlite学习笔记（1）</a>
+									</li>
+					</ul>
+
+		</section><section id="recent-comments-2" class="widget widget_recent_comments"><h2 class="widget-title">近期评论</h2><ul id="recentcomments"><li class="recentcomments"><span class="comment-author-link">Gresces</span> 发表在《<a href="/2011/12/avpbase-dll/comment-page-1/#comment-26846">avpbase.dll的一些学习笔记</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href="http://%E6%97%A0/" class="url" rel="ugc external nofollow">yang</a></span> 发表在《<a href="/2024/04/electron-npm-bug/comment-page-1/#comment-25353">electron 应用接入 npm 包的 4 个坑</a>》</li><li class="recentcomments"><span class="comment-author-link"><a href="https://xfxia.com/138736.html" class="url" rel="ugc external nofollow">对Windows 平台下PE文件数字签名的一些研究 – 小飞侠</a></span> 发表在《<a href="/2015/06/windowspesign/comment-page-1/#comment-25128">对Windows 平台下PE文件数字签名的一些研究</a>》</li><li class="recentcomments"><span class="comment-author-link">hjx</span> 发表在《<a href="/2015/06/windowspesign/comment-page-1/#comment-22651">对Windows 平台下PE文件数字签名的一些研究</a>》</li><li class="recentcomments"><span class="comment-author-link">XUQS</span> 发表在《<a href="/2019/02/varname/comment-page-1/#comment-22503">为什么我还在用匈牙利命名法</a>》</li></ul></section><section id="linkcat-2" class="widget widget_links"><h2 class="widget-title">链接</h2>
+	<ul class="xoxo blogroll">
+<li><a href="http://www.boxcounter.com/" title="Boxcounter的小黑屋" target="_blank">Boxcounter的小黑屋</a></li>
+<li><a href="http://www.xuetr.com/" rel="friend" target="_blank">linxer</a></li>
+
+	</ul>
+</section>
+<section id="meta-2" class="widget widget_meta"><h2 class="widget-title">其他操作</h2>
+		<ul>
+						<li><a href="/wp-login.php">登录</a></li>
+			<li><a href="/feed/">条目 feed</a></li>
+			<li><a href="/comments/feed/">评论 feed</a></li>
+
+			<li><a href="https://cn.wordpress.org/">WordPress.org</a></li>
+		</ul>
+
+		</section>		</aside><!-- #secondary .widget-area -->
+
+	</div><!-- #main -->
+
+	
+	<footer id="colophon" role="contentinfo">
+		
+        <div id="site-generator" class="clearfix">
+
+            
+			<nav class="social-profile" role="navigation" aria-label="Footer Social Links Menu">
+ 		 		<ul>
+				</ul>
+			</nav><!-- .social-profile --><div class="copyright">Copyright © 2026 <a href="/" title="麦田的小黑屋"><span>麦田的小黑屋</span></a>. All Rights Reserved. </div><div class="powered"><span class="theme-name">Theme: Catch Box by </span><span class="theme-author"><a href="https://catchthemes.com/" title="Catch Themes">Catch Themes</a></span></div>
+        </div> <!-- #site-generator -->
+
+	</footer><!-- #colophon -->
+
+</div><!-- #page -->
+
+<a href="#branding" id="scrollup"><span class="screen-reader-text">Scroll Up</span></a>
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/catch-box/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/javascript" src="/wp-content/plugins/wp-syntax/js/wp-syntax.js?ver=1.2" id="wp-syntax-js-js"></script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/skip-link-focus-fix.js?ver=20151112" id="catchbox-skip-link-focus-fix-js"></script>
+<script type="text/javascript" src="/wp-includes/js/comment-reply.min.js?ver=6.9.1" id="comment-reply-js" async="async" data-wp-strategy="async" fetchpriority="low"></script>
+<script type="text/javascript" src="/wp-content/themes/catch-box/js/catchbox-scrollup.min.js?ver=20072014" id="catchbox-scrollup-js"></script>
+<script defer type="text/javascript" src="/wp-content/plugins/akismet/_inc/akismet-frontend.js?ver=1770655319" id="akismet-frontend-js"></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"/wp-includes/js/wp-emoji-release.min.js?ver=6.9.1"}}
+</script>
+<script type="module">
+/* <![CDATA[ */
+/*! This file is auto-generated */
+const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(window._wpemojiSettings=a,"wpEmojiSettingsSupports"),s=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const a=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===a[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,a){let r;const o=(r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),s=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(e=>{s[e]=t(o,e,n,a)}),s}function r(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}a.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),c.toString(),p.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"});const r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=e=>{i(n=e.data),r.terminate(),t(n)})}catch(e){}i(n=f(s,u,c,p))}t(n)}).then(e=>{for(const n in e)a.supports[n]=e[n],a.supports.everything=a.supports.everything&&a.supports[n],"flag"!==n&&(a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&a.supports[n]);var t;a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&!a.supports.flag,a.supports.everything||((t=a.source||{}).concatemoji?r(t.concatemoji):t.wpemoji&&t.twemoji&&(r(t.twemoji),r(t.wpemoji)))});
+//# sourceURL=/wp-includes/js/wp-emoji-loader.min.js
+/* ]]> */
+</script>
+
+</body>
+</html>
